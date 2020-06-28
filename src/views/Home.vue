@@ -1,11 +1,9 @@
 <template>
     <div class="home">
-        Home
     </div>
 </template>
 
 <script lang="ts">
-// @ is an alias to /src
 import { defineComponent } from "@vue/composition-api";
 
 export default defineComponent({
