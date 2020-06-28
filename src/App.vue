@@ -1,21 +1,22 @@
 <template>
     <div>
-        <div>
-            <router-link to="/">Home</router-link> |
-            <router-link to="/min-conflict">Min Conflict</router-link> |
-            <router-link to="/genetic-algorithm">Genetic Algorithm</router-link> |
-            <router-link to="/about">About</router-link>
-        </div>
+        <NavBar />
 
-        <router-view />
+        <div class="mt-16">
+            <router-view />
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "@vue/composition-api";
+import NavBar from "@/components/Navigation/NavBar/NavBar.vue";
 
 export default defineComponent({
-    name: "App"
+    name: "App",
+    components: {
+        NavBar,
+    },
 });
 </script>
 
