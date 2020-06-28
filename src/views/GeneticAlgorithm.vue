@@ -1,14 +1,13 @@
 <template>
-    <div class="home">
-        Home
+    <div>
+        This is Genetic Algorithm
     </div>
 </template>
 
 <script lang="ts">
-// @ is an alias to /src
 import { defineComponent } from "@vue/composition-api";
 
 export default defineComponent({
-    name: "Home",
+    name: "GeneticAlgorithm",
 });
 </script>

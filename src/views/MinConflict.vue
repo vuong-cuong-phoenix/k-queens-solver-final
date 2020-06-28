@@ -1,14 +1,13 @@
 <template>
-    <div class="home">
-        Home
+    <div>
+        This is Min Conflict
     </div>
 </template>
 
-<script lang="ts">
-// @ is an alias to /src
+<script lang=ts>
 import { defineComponent } from "@vue/composition-api";
 
 export default defineComponent({
-    name: "Home",
+    name: "MinConflict",
 });
 </script>
