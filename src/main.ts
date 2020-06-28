@@ -1,5 +1,6 @@
 import Vue from "vue";
 import VueCompositionAPI from "@vue/composition-api";
+import "./assets/styles/tailwind.css";
 
 import App from "./App.vue";
 import "./registerServiceWorker";
