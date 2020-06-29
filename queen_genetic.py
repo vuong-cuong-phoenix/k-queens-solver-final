@@ -2,11 +2,11 @@
 import random
 from functools import reduce
 from itertools import groupby
+import time
+def random_chromosome(size): #making random chromosomes
+    return [ random.randint(1, size) for _ in range(size)]
 
-def random_chromosome(size): #making random chromosomes 
-    return [ random.randint(1, nq) for _ in range(nq) ]
-
-def fitness(chromosome):
+def fitness(chromosome, maxFitness):
     horizontal_collisions = sum([chromosome.count(queen)-1 for queen in chromosome])/2
     left_diagonal_collisions_mat = sorted(reduce(lambda x,y: x + [y - len(x)], chromosome, []))
     left_diagonal_collisions = [len(list(group)) for key, group in groupby(left_diagonal_collisions_mat)]
@@ -15,8 +15,8 @@ def fitness(chromosome):
     diagonal_collisions = reduce(lambda x, y: x + (y*(y-1))/2, left_diagonal_collisions + right_diagonal_collisions, 0) 
     return int(maxFitness - (horizontal_collisions + diagonal_collisions)) 
 
-def probability(chromosome, fitness):
-    return fitness(chromosome) / maxFitness
+def probability(chromosome, fitness, maxFitness):
+    return fitness(chromosome, maxFitness) / maxFitness
 
 def random_pick(population, probabilities):
     populationWithProbabilty = zip(population, probabilities)
@@ -41,15 +41,15 @@ def mutate(x):  #randomly changing the value of a random index of a chromosome
     x[c] = m
     return x
 
-def natural_selection(population, new_population):
+def natural_selection(population, new_population, maxFitness):
     total_population = population + new_population
-    new_total_population = sorted(total_population, key= lambda x: fitness(x))[::-1]
+    new_total_population = sorted(total_population, key= lambda x: fitness(x, maxFitness))[::-1]
     return new_total_population[0:int(len(total_population)/1.5)] if len(population) < 5000 else new_total_population[0:int(len(total_population)/2)]
 
-def genetic_queen(population, fitness):
+def genetic_queen(population, fitness, maxFitness):
     mutation_probability = 0.03
     new_population = []
-    probabilities = [probability(n, fitness) for n in population]
+    probabilities = [probability(n, fitness, maxFitness) for n in population]
     for _ in range(len(population)):
         x = random_pick(population, probabilities) #best chromosome 1
         y = random_pick(population, probabilities) #best chromosome 2
@@ -58,51 +58,77 @@ def genetic_queen(population, fitness):
             child = mutate(child)
         # print_chromosome(child)
         new_population.append(child)
-        if fitness(child) == maxFitness: break
-    new_population = natural_selection(population, new_population)
+        if fitness(child, maxFitness) == maxFitness: break
+    new_population = natural_selection(population, new_population, maxFitness)
     return new_population
 
 def print_chromosome(chrom):
     print("Chromosome = {},  Fitness = {}"
         .format(str(chrom), fitness(chrom)))
 
-if __name__ == "__main__":
-    nq = int(input("Enter Number of Queens: ")) #say N = 8
-    maxFitness = (nq*(nq-1))/2  # 8*7/2 = 28
+def solve(nq):
+    start_time = time.time()
+    maxFitness = (nq * (nq - 1)) / 2  # 8*7/2 = 28
     population = [random_chromosome(nq) for _ in range(100)]
-    
+
     generation = 1
-
-    while not maxFitness in [fitness(chrom) for chrom in population]:
+    output = []
+    while not maxFitness in [fitness(chrom, maxFitness) for chrom in population]:
         print("=== Generation {} ===".format(generation), len(population))
-        population = genetic_queen(population, fitness)
+        population = genetic_queen(population, fitness, maxFitness)
         print("")
-        print("Maximum Fitness = {}".format(max([fitness(n) for n in population])))
+        ranks = sorted([(x, i) for (i, x) in enumerate(population)], key=lambda item: (fitness(item[0], maxFitness), item[1]), reverse=True)[:2]
+
+        # print("Maximum Fitness = {}".format(max([fitness(n, maxFitness) for n in population])))
+        output.append([x[0] for x in ranks])
         generation += 1
-    chrom_out = []
-    print("Solved in Generation {}!".format(generation-1))
-    for chrom in population:
-        if fitness(chrom) == maxFitness:
-            print("");
-            print("One of the solutions: ")
-            chrom_out = chrom
-            print_chromosome(chrom)
-            
-    board = []
+    return output, time.time() - start_time
+    # chrom_out = []
+    # print("Solved in Generation {}!".format(generation - 1))
+    # for chrom in population:
+    #     if fitness(chrom) == maxFitness:
+    #         print("");
+    #         print("One of the solutions: ")
+    #         chrom_out = chrom
+    #         print_chromosome(chrom)
 
-    for x in range(nq):
-        board.append(["x"] * nq)
-        
-    for i in range(nq):
-        board[nq-chrom_out[i]][i]="Q"
+# if __name__ == "__main__":
+    # nq = int(input("Enter Number of Queens: ")) #say N = 8
+    # maxFitness = (nq*(nq-1))/2  # 8*7/2 = 28
+    # population = [random_chromosome(nq) for _ in range(100)]
+    #
+    # generation = 1
+    #
+    # while not maxFitness in [fitness(chrom) for chrom in population]:
+    #     print("=== Generation {} ===".format(generation), len(population))
+    #     population = genetic_queen(population, fitness)
+    #     print("")
+    #     print("Maximum Fitness = {}".format(max([fitness(n) for n in population])))
+    #     generation += 1
+    # chrom_out = []
+    # print("Solved in Generation {}!".format(generation-1))
+    # for chrom in population:
+    #     if fitness(chrom) == maxFitness:
+    #         print("");
+    #         print("One of the solutions: ")
+    #         chrom_out = chrom
+    #         print_chromosome(chrom)
             
-
-    def print_board(board):
-        for row in board:
-            print (" ".join(row))
-            
-    print()
-    print_board(board)
+    # board = []
+    #
+    # for x in range(nq):
+    #     board.append(["x"] * nq)
+    #
+    # for i in range(nq):
+    #     board[nq-chrom_out[i]][i]="Q"
+    #
+    #
+    # def print_board(board):
+    #     for row in board:
+    #         print (" ".join(row))
+    #
+    # print()
+    # print_board(board)
             
            
             

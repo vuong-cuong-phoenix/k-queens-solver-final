@@ -39,7 +39,7 @@ def main(argv: List[str]) -> None:
         for j in range(i+1, len(columns)):
             csp.add_constraint(QueenArcConstraint(i, j))
     min_conflict: MinConflict[int, int] = MinConflict(csp, State[int, int]({i: 0 for i in range(size)}), 1000)
-    solution: Optional[State[int, int]] = min_conflict.solve()
+    solution, steps = min_conflict.solve()
     if solution is None:
         print("No solution found!")
     else:
