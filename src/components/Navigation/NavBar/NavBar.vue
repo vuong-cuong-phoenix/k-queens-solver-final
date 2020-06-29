@@ -28,7 +28,7 @@
         </div>
 
         <div v-if="sidebarShowing">
-            <SideBar />
+            <Sidebar />
             <Backdrop
                 :isShowing="sidebarShowing"
                 @close="sidebarShowing = false"
@@ -41,14 +41,14 @@
 import { defineComponent, ref, computed } from "@vue/composition-api";
 import { mapGetters } from "vuex";
 import Backdrop from "@/components/Backdrop/Backdrop.vue";
-import SideBar from "@/components/Navigation/SideBar/SideBar.vue";
+import Sidebar from "@/components/Navigation/Sidebar/Sidebar.vue";
 
 export default defineComponent({
     name: "NavBar",
 
     components: {
         Backdrop,
-        SideBar,
+        Sidebar,
     },
 
     setup(props, context) {

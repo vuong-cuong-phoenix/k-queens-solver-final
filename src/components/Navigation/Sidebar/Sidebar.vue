@@ -11,22 +11,22 @@
         </div>
 
         <div class="mt-8">
-            <SideBarItem
+            <SidebarItem
                 link="/"
                 :icon="['fas', 'home']"
                 name="Home"
             />
-            <SideBarItem
+            <SidebarItem
                 link="/min-conflict"
                 :icon="['fas', 'home']"
                 name="Min-Conflict"
             />
-            <SideBarItem
+            <SidebarItem
                 link="/genetic-algorithm"
                 :icon="['fas', 'home']"
                 name="Genetic Algorithm"
             />
-            <SideBarItem
+            <SidebarItem
                 link="/about"
                 :icon="['fas', 'info-circle']"
                 name="About"
@@ -37,12 +37,12 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/composition-api";
-import SideBarItem from "@/components/Navigation/SideBar/SideBarItem/SideBarItem.vue";
+import SidebarItem from "@/components/Navigation/Sidebar/SidebarItem/SidebarItem.vue";
 
 export default defineComponent({
-    name: "SideBar",
+    name: "Sidebar",
     components: {
-        SideBarItem,
+        SidebarItem,
     },
 });
 </script>
