@@ -1,11 +1,17 @@
 <template>
     <router-link
-        class="block py-3 pl-4 text-lg hover:bg-gray-300"
+        class="flex items-center py-3 pl-4 text-lg hover:bg-gray-300"
         :to="link"
         @click.native="close"
     >
-        <font-awesome-icon :icon="icon"></font-awesome-icon>
-        <span class="ml-2">{{ name }}</span>
+        <div class="inline-flex w-8">
+            <font-awesome-icon
+                v-if="icon"
+                :icon="icon"
+                class="mx-auto"
+            ></font-awesome-icon>
+        </div>
+        <span class="flex-grow ml-2">{{ name }}</span>
     </router-link>
 </template>
 
@@ -18,7 +24,7 @@ export default defineComponent({
     props: {
         icon: {
             type: Array,
-            required: true,
+            required: false,
         },
         name: {
             type: String,
