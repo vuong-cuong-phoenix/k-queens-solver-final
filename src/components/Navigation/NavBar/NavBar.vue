@@ -27,13 +27,14 @@
             </button>
         </div>
 
-        <div v-if="sidebarShowing">
-            <Sidebar />
-            <Backdrop
-                :isShowing="sidebarShowing"
-                @close="sidebarShowing = false"
-            />
-        </div>
+        <transition name="slide">
+            <Sidebar v-if="sidebarShowing" />
+        </transition>
+        <Backdrop
+            v-if="sidebarShowing"
+            :isShowing="sidebarShowing"
+            @close="sidebarShowing = false"
+        />
     </header>
 </template>
 
@@ -63,3 +64,16 @@ export default defineComponent({
     },
 });
 </script>
+
+<style lang="postcss" scoped>
+.slide-enter-active,
+.slide-leave-active {
+    transition: transform 0.25s ease-in-out;
+    z-index: 10;
+}
+
+.slide-enter,
+.slide-leave-to {
+    transform: translateX(-100%);
+}
+</style>
