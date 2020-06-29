@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed inset-y-0 left-0 z-10 flex flex-col w-64 h-full text-black bg-white">
+    <div class="fixed inset-y-0 left-0 z-10 flex flex-col w-64 h-full text-black bg-white shadow-2xl">
         <div class="flex items-center h-32 text-white bg-blue-600">
             <div class="mx-auto">
                 <font-awesome-icon
