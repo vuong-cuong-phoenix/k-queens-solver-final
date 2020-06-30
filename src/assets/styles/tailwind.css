@@ -2,4 +2,21 @@
 
 @tailwind components;
 
+/*-------------------------------- Buttons --------------------------------*/
+.btn {
+    @apply px-4 py-2 font-bold rounded;
+}
+.btn:focus {
+    @apply outline-none;
+}
+
+.btn-primary {
+    @apply text-white bg-blue-600;
+}
+
+.btn-primary:hover {
+    @apply bg-blue-700;
+}
+
 @tailwind utilities;
+
