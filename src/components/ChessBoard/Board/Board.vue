@@ -11,8 +11,11 @@
             >
                 <div
                     class="flex items-center justify-center"
-                    :class="(row + colInRow) % 2 === 0 ? 'bg-white' : 'bg-blue-800'"
-                    :style="{ width: edgeLength + 'rem', height: edgeLength + 'rem' }"
+                    :class="(row + colInRow) % 2 == 0 ? 'bg-gray-100' : 'bg-blue-800'"
+                    :style="{ 
+                        width: edgeLength + 'rem',
+                        height: edgeLength + 'rem',
+                    }"
                 >
                     {{ row + ',' + colInRow }}
                 </div>
