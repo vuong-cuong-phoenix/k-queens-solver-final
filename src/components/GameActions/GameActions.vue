@@ -21,7 +21,7 @@ export default defineComponent({
 
     setup(props, context) {
         function random() {
-            context.emit("random");
+            context.emit("randomize");
         }
 
         function start() {

@@ -59,6 +59,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, onBeforeUpdate } from "@vue/composition-api";
+import { bus } from "@/main";
 import ChessBoardLegend from "@/components/ChessBoard/ChessBoardLegend/ChessBoardLegend.vue";
 import Board from "@/components/ChessBoard/Board/Board.vue";
 
@@ -79,13 +80,17 @@ export default defineComponent({
             type: Number,
             required: true,
         },
+        steps: {
+            type: Array,
+            required: true,
+        },
     },
 
     setup(props, context) {
-        const queens = ref<any[]>([]);
+        const queens = ref<Element[] | Vue[]>([]);
 
         onMounted(() => {
-            console.log(queens.value);
+            bus.$emit("queensMinConflict", queens.value);
         });
 
         onBeforeUpdate(() => {
