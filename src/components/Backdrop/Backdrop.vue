@@ -2,7 +2,7 @@
     <button
         v-if="isShowing"
         tabindex="-1"
-        class="fixed inset-0 w-full h-full bg-black cursor-default bg-opacity-50 focus:outline-none"
+        class="fixed inset-0 z-30 w-full h-full bg-black cursor-default bg-opacity-50 focus:outline-none"
         @click.self="close"
     >
     </button>

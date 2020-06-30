@@ -1,6 +1,6 @@
 <template>
     <router-link
-        class="flex items-center py-3 pl-4 text-lg hover:bg-gray-300"
+        class="flex items-center py-3 pl-4 text-base md:text-lg hover:bg-gray-300"
         :to="link"
         @click.native="close"
     >

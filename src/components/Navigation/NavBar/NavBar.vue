@@ -1,5 +1,5 @@
 <template>
-    <header class="fixed inset-x-0 top-0 w-full h-16 px-4 text-white bg-blue-600">
+    <header class="fixed inset-x-0 top-0 w-full h-16 px-2 text-white bg-blue-600 sm:px-4">
         <div class="flex items-center justify-between h-full">
             <button
                 class="px-3 py-2 border border-white hover:border-gray-300 hover:text-gray-300 focus:outline-none rounded-md"
