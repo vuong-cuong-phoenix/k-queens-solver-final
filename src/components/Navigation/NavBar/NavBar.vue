@@ -30,11 +30,13 @@
         <transition name="slide">
             <Sidebar v-if="sidebarShowing" />
         </transition>
-        <Backdrop
-            v-if="sidebarShowing"
-            :isShowing="sidebarShowing"
-            @close="sidebarShowing = false"
-        />
+        <transition name="fade">
+            <Backdrop
+                v-if="sidebarShowing"
+                :isShowing="sidebarShowing"
+                @close="sidebarShowing = false"
+            />
+        </transition>
     </header>
 </template>
 
@@ -69,11 +71,20 @@ export default defineComponent({
 .slide-enter-active,
 .slide-leave-active {
     transition: transform 0.25s ease-in-out;
-    z-index: 10;
 }
 
 .slide-enter,
 .slide-leave-to {
     transform: translateX(-100%);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.25s ease-in-out;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
 }
 </style>

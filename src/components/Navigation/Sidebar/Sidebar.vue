@@ -16,23 +16,6 @@
                 :icon="['fas', 'home']"
                 name="Home"
             />
-            <!-- <SidebarGroupItem -->
-            <!--     :headerIcon="['fas', 'home']" -->
-            <!--     headerTitle="Algorithms" -->
-            <!--     :showing="algorithmShowing" -->
-            <!--     @toggle="algorithmShowing = !algorithmShowing" -->
-            <!-- > -->
-            <!--     <SidebarItem -->
-            <!--         link="/min-conflict" -->
-            <!--         name="Min-Conflict" -->
-            <!--         class="pl-8" -->
-            <!--     /> -->
-            <!--     <SidebarItem -->
-            <!--         link="/genetic-algorithm" -->
-            <!--         name="Genetic Algorithm" -->
-            <!--         class="pl-8" -->
-            <!--     /> -->
-            <!-- </SidebarGroupItem> -->
             <SidebarItem
                 link="/min-conflict"
                 name="Min-Conflict"
@@ -41,7 +24,6 @@
                 link="/genetic-algorithm"
                 name="Genetic Algorithm"
             />
-
             <SidebarItem
                 link="/about"
                 :icon="['fas', 'info-circle']"
