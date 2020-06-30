@@ -2,7 +2,11 @@
     <div
         class="absolute flex flex-no-wrap"
         :class="{ 'flex-col': !isRow }"
-        :style="isRow ? { top: -edgeLength + 'rem' } : { left: -edgeLength + 'rem' }"
+        :style="{
+            top: isRow ? -edgeLength + 'rem' : 0,
+            left: isRow? 0 : -edgeLength + 'rem',
+            fontSize: (edgeLength/2) + 'rem'
+        }"
     >
         <div
             class="flex items-center justify-center"
