@@ -1,16 +1,18 @@
 <template>
     <div
-        class="absolute flex flex-no-wrap"
+        class="absolute flex flex-no-wrap text-xl"
         :class="{ 'flex-col': !isRow }"
         :style="{
             top: isRow ? -edgeLength + 'rem' : 0,
             left: isRow? 0 : -edgeLength + 'rem',
-            fontSize: (edgeLength/2) + 'rem'
         }"
     >
         <div
             class="flex items-center justify-center"
-            :style="{ width: edgeLength + 'rem', height: edgeLength + 'rem' }"
+            :style="{ 
+                width: edgeLength + 'rem',
+                height: edgeLength + 'rem',
+            }"
             v-for="i in kNumber"
             :key="i"
         >{{ i }}</div>
