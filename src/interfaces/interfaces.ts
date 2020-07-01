@@ -10,6 +10,7 @@ export interface Conflict {
 
 export interface Step {
     conflicts: Array<Conflict>;
+    queen: number;
     destination: Position;
 }
 
