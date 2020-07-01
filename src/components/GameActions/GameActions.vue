@@ -20,9 +20,9 @@
         <div class="text-center space-x-2">
             <button
                 class="shadow-md btn btn-primary"
-                @click="start"
+                @click="solve"
             >
-                Start
+                Solve
             </button>
 
             <!-- <button class="shadow-md btn btn-primary">Pause</button> -->
@@ -47,14 +47,14 @@ export default defineComponent({
             context.emit("reset");
         }
 
-        function start() {
-            context.emit("start");
+        function solve() {
+            context.emit("solve");
         }
 
         return {
             randomize,
             reset,
-            start,
+            solve,
         };
     },
 });
