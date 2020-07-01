@@ -48,8 +48,9 @@ export default defineComponent({
 });
 </script>
 
-<style lang="postcss" scoped>
+<style scoped>
 .router-link-exact-active {
-    @apply bg-gray-300 font-semibold;
+    @apply bg-gray-300;
+    @apply font-semibold;
 }
 </style>

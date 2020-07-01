@@ -1,12 +1,10 @@
 <template>
-    <div>
+    <div class="mt-16 mb-10 md:mt-24">
         <div
             class="relative mx-auto board"
-            style="z-index: -20"
             :style="{ 
                 height: kNumber * edgeLength + 'rem',
                 width: kNumber * edgeLength + 'rem',
-                marginTop: (edgeLength + 1) + 'rem',
             }"
         >
             <ChessBoardLegend

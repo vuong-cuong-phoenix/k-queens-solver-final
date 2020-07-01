@@ -1,5 +1,5 @@
 <template>
-    <header class="fixed inset-x-0 top-0 w-full h-16 px-2 text-white bg-blue-600 sm:px-4">
+    <header class="fixed inset-x-0 top-0 z-20 w-full h-16 px-2 text-white bg-blue-600 sm:px-4">
         <div class="flex items-center justify-between h-full">
             <button
                 class="px-3 py-2 border border-white hover:border-gray-300 hover:text-gray-300 focus:outline-none rounded-md"
@@ -26,17 +26,6 @@
                 ></font-awesome-icon>
             </button>
         </div>
-
-        <transition name="slide">
-            <Sidebar v-if="sidebarShowing" />
-        </transition>
-        <transition name="fade">
-            <Backdrop
-                v-if="sidebarShowing"
-                :isShowing="sidebarShowing"
-                @close="sidebarShowing = false"
-            />
-        </transition>
     </header>
 </template>
 
@@ -67,24 +56,3 @@ export default defineComponent({
 });
 </script>
 
-<style lang="postcss" scoped>
-.slide-enter-active,
-.slide-leave-active {
-    transition: transform 0.25s ease-in-out;
-}
-
-.slide-enter,
-.slide-leave-to {
-    transform: translateX(-100%);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.25s ease-in-out;
-}
-
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}
-</style>
