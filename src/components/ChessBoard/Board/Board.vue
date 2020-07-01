@@ -17,7 +17,6 @@
                         height: edgeLength + 'rem',
                     }"
                 >
-                    {{ row + ',' + colInRow }}
                 </div>
             </div>
         </div>
