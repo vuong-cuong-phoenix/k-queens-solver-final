@@ -7,7 +7,7 @@
             />
             <ChessBoard
                 :kNumber="4"
-                :edgeLength="3"
+                :edgeLength="4"
                 :steps="steps"
             />
         </div>
@@ -20,6 +20,7 @@
 import { defineComponent, ref, onMounted } from "@vue/composition-api";
 import { bus } from "@/main";
 import gsap from "gsap";
+import * as interfaces from "@/interfaces/interfaces";
 import GameActions from "@/components/GameActions/GameActions.vue";
 import ChessBoard from "@/components/ChessBoard/ChessBoard.vue";
 
@@ -36,7 +37,7 @@ export default defineComponent({
 
         bus.$on("queensMinConflict", (queensRef: Element[] | Vue[]) => (queens.value = queensRef));
 
-        const steps = ref<any[]>([]);
+        const steps = ref<interfaces.Step[]>([]);
 
         function randomize() {
             console.log("abc");

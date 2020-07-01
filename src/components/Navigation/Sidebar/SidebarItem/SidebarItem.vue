@@ -23,7 +23,7 @@ export default defineComponent({
 
     props: {
         icon: {
-            type: Array,
+            type: Array as () => string[],
             required: false,
         },
         name: {

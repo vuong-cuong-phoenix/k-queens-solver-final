@@ -33,7 +33,7 @@ export default defineComponent({
     name: "SidebarDropdown",
     props: {
         headerIcon: {
-            type: Array,
+            type: Array as () => string[],
             required: false,
         },
         headerTitle: {

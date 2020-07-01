@@ -28,8 +28,8 @@
                 :kNumber="kNumber"
                 :edgeLength="edgeLength"
                 :initPosition="{
-                    x: 1,
-                    y: 2
+                    x: 0,
+                    y: 0
                 }"
             />
         </div>
@@ -63,8 +63,9 @@ export default defineComponent({
             required: true,
         },
         steps: {
-            type: Array as () => Array<interfaces.Step>,
-            required: true,
+            type: Array as () => interfaces.Step[],
+            required: false,
+            default: () => [],
         },
     },
 
