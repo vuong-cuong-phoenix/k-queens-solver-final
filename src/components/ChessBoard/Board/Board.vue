@@ -1,9 +1,9 @@
 <template>
     <div class="">
         <div
-            class="flex"
             v-for="row in kNumber"
             :key="row"
+            class="flex"
         >
             <div
                 v-for="colInRow in kNumber"

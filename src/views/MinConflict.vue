@@ -11,6 +11,7 @@
                 :steps="steps"
             />
         </div>
+
         <div class="w-full md:w-4/12">ListMoves</div>
     </div>
 </template>
@@ -33,7 +34,7 @@ export default defineComponent({
     setup(props, context) {
         const queens = ref<Element[] | Vue[]>([]);
 
-        bus.$on("queensMinConflict", (queensRef: any[]) => (queens.value = queensRef));
+        bus.$on("queensMinConflict", (queensRef: Element[] | Vue[]) => (queens.value = queensRef));
 
         const steps = ref<any[]>([]);
 

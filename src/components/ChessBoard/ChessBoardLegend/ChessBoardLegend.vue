@@ -8,13 +8,13 @@
         }"
     >
         <div
+            v-for="i in kNumber"
+            :key="i"
             class="flex items-center justify-center"
             :style="{ 
                 width: edgeLength + 'rem',
                 height: edgeLength + 'rem',
             }"
-            v-for="i in kNumber"
-            :key="i"
         >{{ i }}</div>
     </div>
 
