@@ -13,10 +13,15 @@
 .btn-primary {
     @apply text-white bg-blue-600;
 }
-
 .btn-primary:hover {
     @apply bg-blue-700;
 }
 
-@tailwind utilities;
+.btn-success {
+    @apply text-white bg-green-600;
+}
+.btn-success:hover {
+    @apply bg-green-700;
+}
 
+@tailwind utilities;
