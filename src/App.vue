@@ -2,7 +2,7 @@
     <div>
         <NavBar />
 
-        <div class="max-w-full px-2 py-4 mt-16 sm:px-4 ">
+        <div class="max-w-full px-2 py-4 mt-12 sm:px-4 ">
             <router-view />
         </div>
     </div>
