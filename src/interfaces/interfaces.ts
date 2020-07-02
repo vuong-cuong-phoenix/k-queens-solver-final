@@ -10,8 +10,7 @@ export interface Conflict {
 
 export interface Step {
     conflicts: Conflict[];
-    queen: number;
-    destination: Position;
+    choice: Position;
 }
 
 export interface Individual {
@@ -24,3 +23,8 @@ export interface Generation {
     individuals: Individual[];
 }
 
+export interface MinConflictPost {
+    k: number;
+    initState: number[];
+    iteration: number;
+}
