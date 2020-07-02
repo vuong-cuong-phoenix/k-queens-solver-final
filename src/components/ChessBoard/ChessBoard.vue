@@ -1,6 +1,6 @@
 <template>
     <div
-        class="relative mx-auto"
+        class="relative"
         :style="{ 
             height: (kNumber * edgeLength) + 'rem',
             width: (kNumber * edgeLength) + 'rem',

@@ -2,7 +2,7 @@
     <div class="flex flex-wrap -mx-4">
         <div class="w-full px-4 md:w-8/12">
             <ChessBoard
-                class="mt-16 mb-10  md:mt-24"
+                class="mx-auto mt-16 mb-10 md:mt-24"
                 :showLegends="true"
                 :kNumber="kNumber"
                 :edgeLength="edgeLength"
@@ -13,7 +13,7 @@
                 @solve="solve"
                 @reset="reset"
                 :speed="speed"
-                @speedChanged="value => speed = value"
+                @speedChanged="(value) => (speed = value)"
             />
         </div>
 
@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onBeforeUpdate, watch, reactive } from "@vue/composition-api";
+import { defineComponent, ref, watch, reactive } from "@vue/composition-api";
 import { bus } from "@/main";
 import gsap from "gsap";
 import * as interfaces from "@/interfaces/interfaces";
@@ -41,7 +41,7 @@ export default defineComponent({
         ListMoves,
     },
 
-    setup(props, context) {
+    setup() {
         // Initial objects
         const timelines = reactive({
             queens: gsap.timeline({
@@ -169,7 +169,7 @@ export default defineComponent({
         }
 
         // Funtionalities
-        watch(speed, (curr, prev) => {
+        watch(speed, (curr) => {
             timelines.queens.timeScale(curr);
             timelines.moves.timeScale(curr);
         });
