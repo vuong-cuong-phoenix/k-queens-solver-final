@@ -4,8 +4,8 @@
             :icon="['fas', 'crown']"
             class="text-blue-700"
         ></font-awesome-icon>
-        <span class="ml-4 font-semibold">Queen {{ step.queen }}</span>
-        <span class="ml-4 text-blue-700">({{ step.destination.x }},{{ step.destination.y }})</span>
+        <span class="ml-4 font-semibold">Queen {{ step.choice.x }}</span>
+        <span class="ml-4 text-blue-700">({{ step.choice.x }},{{ step.choice.y }})</span>
     </div>
 </template>
 
