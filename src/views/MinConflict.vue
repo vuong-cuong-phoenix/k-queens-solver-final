@@ -2,6 +2,7 @@
     <div class="flex flex-wrap -mx-4">
         <div class="w-full px-4 md:w-8/12">
             <ChessBoard
+                class="mt-16 mb-10  md:mt-24"
                 :showLegends="true"
                 :kNumber="kNumber"
                 :edgeLength="edgeLength"
