@@ -27,12 +27,13 @@
             :kNumber="kNumber"
             :edgeLength="edgeLength"
             :isStatic="isStatic"
+            :initPosition="initPositionComputed"
         />
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onBeforeUpdate } from "@vue/composition-api";
+import { defineComponent, ref, computed, onMounted, onBeforeUpdate } from "@vue/composition-api";
 import { bus } from "@/main";
 import * as interfaces from "@/interfaces/interfaces";
 import ChessBoardLegend from "@/components/ChessBoard/ChessBoardLegend/ChessBoardLegend.vue";
@@ -57,12 +58,12 @@ export default defineComponent({
             type: Number,
             required: true,
         },
-        isStatic: {
+        showLegends: {
             type: Boolean,
             required: false,
             default: false,
         },
-        showLegends: {
+        isStatic: {
             type: Boolean,
             required: false,
             default: false,
@@ -72,6 +73,33 @@ export default defineComponent({
             required: false,
             default: () => [],
         },
+        initPosition: {
+            type: Array as () => interfaces.Position[],
+            required: false,
+        },
+    },
+
+    setup(props, context) {
+        const initPositionComputed = computed(() => {
+            let result = props.initPosition;
+
+            if (!result) {
+                result = [];
+
+                for (let i = 0; i <= props.kNumber; ++i) {
+                    result.push({
+                        x: 0,
+                        y: 0,
+                    });
+                }
+            }
+
+            return result;
+        });
+
+        return {
+            initPositionComputed,
+        };
     },
 });
 </script>

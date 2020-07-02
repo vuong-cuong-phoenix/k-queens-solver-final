@@ -6,8 +6,8 @@
             ref="queens"
             class="absolute flex items-center justify-center"
             :style="{ 
-                        left: (-edgeLength + (initPositionComputed[i-1].x * edgeLength)) + 'rem',
-                        top: (-edgeLength + (initPositionComputed[i-1].y * edgeLength)) + 'rem',
+                        left: (-edgeLength + (initPosition[i-1].x * edgeLength)) + 'rem',
+                        top: (-edgeLength + (initPosition[i-1].y * edgeLength)) + 'rem',
                         height: edgeLength  + 'rem',
                         width: edgeLength + 'rem',
                     }"
@@ -49,7 +49,7 @@ export default defineComponent({
         },
         initPosition: {
             type: Array as () => interfaces.Position[],
-            required: false,
+            required: true,
         },
         isStatic: {
             type: Boolean,
@@ -60,23 +60,6 @@ export default defineComponent({
 
     setup(props, context) {
         const queens = ref<Element[] | Vue[]>([]);
-
-        const initPositionComputed = computed(() => {
-            let result = props.initPosition;
-
-            if (!result) {
-                result = [];
-
-                for (let i = 0; i <= props.kNumber; ++i) {
-                    result.push({
-                        x: 0,
-                        y: 0,
-                    });
-                }
-            }
-
-            return result;
-        });
 
         onMounted(() => {
             if (!props.isStatic) {
@@ -90,7 +73,6 @@ export default defineComponent({
 
         return {
             queens,
-            initPositionComputed,
         };
     },
 });
