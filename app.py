@@ -8,11 +8,15 @@ from min_conflict import MinConflict
 from queen_arc_constraint import QueenArcConstraint
 from state import State
 from queen_genetic import solve
-
+from flask_cors import CORS, cross_origin
+app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 app = Flask(__name__)
 
 
 @app.route('/min-conflict', methods=['POST'])
+@cross_origin()
 def min_conflict_solve():
     req_data = request.get_json()
     k: int = req_data['k']
@@ -38,6 +42,7 @@ def min_conflict_solve():
 
 
 @app.route('/ga', methods=['POST'])
+@cross_origin()
 def ga():
     req_data = request.get_json()
     nq = req_data['nq']
