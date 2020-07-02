@@ -116,6 +116,7 @@
 <script lang="ts">
 import { defineComponent, ref, reactive, onMounted, computed, watch, onBeforeUpdate } from "@vue/composition-api";
 import gsap from "gsap";
+import axios, { AxiosResponse } from "axios";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/default.css";
 import ChessBoard from "@/components/ChessBoard/ChessBoard.vue";
@@ -144,6 +145,7 @@ export default defineComponent({
                     repeat: -1,
                     repeatDelay: 0.5,
                     yoyo: true,
+                    force3D: false,
                 },
             }),
         });
@@ -153,9 +155,17 @@ export default defineComponent({
         const crossOverPoint = ref<number>(Math.floor(kNumber.value / 2 - 1));
 
         // Core
-        const generations = ref<interfaces.Generation[]>([]);
+        const generations = ref<interfaces.Individual[]>([]);
+        // Initialize state
+        const initialState: interfaces.Position[] = [];
+        for (let i = 1; i <= kNumber.value; ++i) {
+            initialState.push({
+                x: i,
+                y: 1,
+            });
+        }
         const currentIndividual = ref<interfaces.Individual>({
-            state: [],
+            state: initialState,
             fitnessValue: 0,
             parents: [],
         });
@@ -186,62 +196,98 @@ export default defineComponent({
 
         // Template references
         const parentsRef = ref<Vue[]>([]);
-        const parentsElement = ref<Element[]>([]);
         const individualRef = ref<Vue>();
 
-        // Simulated data
-        generations.value = simulation.generations;
-        currentIndividual.value = generations.value[0].individuals[0];
-        // currentIndividual.value = generations.value[2].individuals[0];
+        async function solve() {
+            const postData: interfaces.GeneticAlgorithmPostRequest = {
+                k: kNumber.value,
+            };
 
-        function solve() {
-            timelines.generateIcon.to("#generateGradient stop", {
-                repeat: -1,
-                repeatDelay: 2,
-                yoyo: true,
-                stopColor: "#ff80b3",
-            });
+            try {
+                const response: AxiosResponse<interfaces.GeneticAlgorithmPostResponse> = await axios.post(
+                    "/genetic-algorithm",
+                    postData
+                );
 
-            generations.value.forEach((gen) => {
-                gen.individuals.forEach((indi) => {
-                    // Hide all first
-                    timelines.boards.to([...parentsElement.value, individualRef.value!.$el], {
-                        opacity: 0,
-                        duration: 0.5,
-                        onComplete: () => {
-                            currentIndividual.value = indi;
-                        },
-                    });
-                    // Dummy animation to delay before animate Parents
-                    timelines.boards.to(individualRef.value!.$el, { duration: 0.25 });
-                    // Then animate Parents
-                    timelines.boards.to(parentsElement.value, { opacity: 1, duration: baseDuration });
-                    // Dummy animation to delay before animate Individual
-                    timelines.boards.to(individualRef.value!.$el, { duration: 0.25 });
-                    // Finally animate Individual
-                    timelines.boards.to(individualRef.value!.$el, { opacity: 1, duration: baseDuration });
-                });
-            });
-
-            timelines.boards.to(individualRef.value!.$el, {
-                duration: 0,
-                onComplete: () => {
-                    timelines.generateIcon.kill();
-                },
-            });
+                generations.value = response.data.generations;
+            } catch (err) {
+                console.error(err);
+            }
         }
 
         function reset() {
-            console.log("Reset...");
+            const resetTimeline = gsap.timeline({
+                defaults: {
+                    force3D: false,
+                },
+            });
+
+            resetTimeline.to([parentsRef.value[0].$el, parentsRef.value[1].$el, individualRef.value!.$el], {
+                opacity: 0,
+                duration: 0.5,
+                onComplete: () => {
+                    currentIndividual.value = {
+                        state: initialState,
+                        fitnessValue: 0,
+                        parents: [],
+                    };
+                },
+            });
+
+            resetTimeline.to([parentsRef.value[0].$el, parentsRef.value[1].$el, individualRef.value!.$el], {
+                opacity: 1,
+                duration: 1,
+            });
         }
 
+        // Animate whenever getting a solution
+        watch(generations, (curr) => {
+            console.log("[watch] 'generations' changed...");
+            // Start animations
+            timelines.generateIcon.play();
+
+            curr.forEach((gen) => {
+                // Hide all first
+                timelines.boards.to([parentsRef.value[0].$el, parentsRef.value[1].$el, individualRef.value!.$el], {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        currentIndividual.value = gen;
+                    },
+                });
+                // Dummy animation to delay before animate Parents
+                timelines.boards.to(individualRef.value!.$el, { duration: 0.25 });
+                // Then animate Parents
+                timelines.boards.to([parentsRef.value[0].$el, parentsRef.value[1].$el], {
+                    opacity: 1,
+                    duration: baseDuration,
+                });
+                // Dummy animation to delay before animate Individual
+                timelines.boards.to(individualRef.value!.$el, { duration: 0.25 });
+                // Finally animate Individual
+                timelines.boards.to(individualRef.value!.$el, { opacity: 1, duration: baseDuration });
+            });
+
+            timelines.boards.eventCallback("onComplete", () => {
+                timelines.generateIcon.paused(true);
+            });
+        });
+
+        // Change animation's speed
         watch(speed, (curr) => {
             timelines.boards.timeScale(curr);
             timelines.generateIcon.timeScale(curr);
         });
 
         onMounted(() => {
-            parentsElement.value = parentsRef.value.map((vueComponent) => vueComponent.$el);
+            // Initialize animation for 'generateIcon'
+            timelines.generateIcon.to("#generateGradient stop", {
+                repeat: -1,
+                repeatDelay: 2,
+                yoyo: true,
+                stopColor: "#ff80b3",
+            });
+            timelines.generateIcon.paused(true);
         });
 
         return {
