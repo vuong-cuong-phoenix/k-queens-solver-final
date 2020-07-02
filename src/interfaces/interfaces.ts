@@ -23,8 +23,13 @@ export interface Generation {
     individuals: Individual[];
 }
 
-export interface MinConflictPost {
+export interface MinConflictPostRequest {
     k: number;
     initState: number[];
     iteration: number;
+}
+
+export interface MinConflictPostResponse {
+    steps: Step[];
+    time: number;
 }

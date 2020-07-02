@@ -61,11 +61,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, reactive } from "@vue/composition-api";
+import { defineComponent, ref, computed, watch, reactive, watchEffect } from "@vue/composition-api";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/default.css";
 import gsap from "gsap";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { bus } from "@/main";
 import * as interfaces from "@/interfaces/interfaces";
 import ChessBoard from "@/components/ChessBoard/ChessBoard.vue";
@@ -119,19 +119,22 @@ export default defineComponent({
         });
 
         // Template references
-        const queens = ref<Element[] | Vue[]>([]);
-        bus.$on("queensMinConflict", (queensRef: Element[] | Vue[]) => (queens.value = queensRef));
+        const queens = ref<Element[]>([]);
+        bus.$on("queenRefs", (queensRef: Element[]) => (queens.value = queensRef));
 
-        const moves = ref<Vue[]>([]);
+        const moves = ref<Element[]>([]);
 
         // Helper functions
         function resetMoves() {
-            steps.value.forEach((_, index) => {
-                gsap.to((moves.value[index] as Vue).$el, {
+            if (moves.value.length !== 0) {
+                gsap.to(moves.value, {
                     opacity: 0,
                     duration: 0.25,
+                    onComplete: () => {
+                        steps.value = [];
+                    },
                 });
-            });
+            }
         }
 
         // Game actions
@@ -161,67 +164,70 @@ export default defineComponent({
         function reset() {
             currentState.value = [];
 
-            for (let i = 0; i < kNumber.value; ++i) {
-                gsap.to(queens.value[i], {
-                    x: 0,
-                    y: 0,
-                    ease: "none",
-                    duration: 0.25,
-                    force3D: false,
-                });
-            }
+            gsap.to(queens.value, {
+                x: 0,
+                y: 0,
+                ease: "none",
+                duration: 0.25,
+                force3D: false,
+            });
 
             resetMoves();
         }
 
-        function solve() {
-            let initState = currentState.value.map((pos) => pos.y - 1);
+        async function solve() {
+            const initState = currentState.value.map((pos) => pos.y - 1);
 
             if (initState.length === 0) {
-                initState = [0, 0, 0, 0];
+                for (let i = 0; i < kNumber.value; ++i) {
+                    initState.push(0);
+                }
             }
 
-            const postData: interfaces.MinConflictPost = {
+            const postData: interfaces.MinConflictPostRequest = {
                 k: kNumber.value,
                 initState: initState,
                 iteration: 1000 * kNumber.value,
             };
 
-            axios
-                .post("http://localhost:5000/min-conflict", postData)
-                .then((response) => {
-                    const resultSteps: interfaces.Step[] = response.data.steps;
-                    steps.value = resultSteps;
+            try {
+                const response: AxiosResponse<interfaces.MinConflictPostResponse> = await axios.post(
+                    "/min-conflict",
+                    postData
+                );
 
-                    console.log("initState:", initState);
-                    console.log(steps.value);
-
-                    steps.value.forEach((step, index) => {
-                        timelines.queens.to(queens.value[step.choice.x - 1], {
-                            x: `${step.choice.x * edgeLength.value}rem`,
-                            y: `${step.choice.y * edgeLength.value}rem`,
-                            duration: baseDuration,
-                        });
-                    });
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+                steps.value = response.data.steps;
+            } catch (error) {
+                console.error(error);
+            }
         }
 
-        // Funtionalities
-        watch(speed, (curr) => {
-            timelines.queens.timeScale(curr);
-            timelines.moves.timeScale(curr);
+        // Animate whenever getting a solution
+        watch(steps, (curr) => {
+            console.log("[watch] 'steps' running...");
+            curr.forEach((step) => {
+                timelines.queens.to(queens.value[step.choice.x - 1], {
+                    x: `${step.choice.x * edgeLength.value}rem`,
+                    y: `${step.choice.y * edgeLength.value}rem`,
+                    duration: baseDuration,
+                });
+            });
         });
 
         watch(moves, (curr) => {
-            steps.value.forEach((step, index) => {
-                timelines.moves.to(curr[index].$el, {
+            console.log("[watch] 'moves' running...");
+            curr.forEach((element) => {
+                timelines.moves.to(element, {
                     opacity: 1,
                     duration: baseDuration,
                 });
             });
+        });
+
+        // Change animation's speed
+        watch(speed, (curr) => {
+            timelines.queens.timeScale(curr);
+            timelines.moves.timeScale(curr);
         });
 
         return {

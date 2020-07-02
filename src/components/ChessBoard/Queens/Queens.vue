@@ -59,11 +59,11 @@ export default defineComponent({
     },
 
     setup(props, context) {
-        const queens = ref<Element[] | Vue[]>([]);
+        const queens = ref<Element[]>([]);
 
         onMounted(() => {
             if (!props.isStatic) {
-                bus.$emit("queensMinConflict", queens.value);
+                bus.$emit("queenRefs", queens.value);
             }
         });
 

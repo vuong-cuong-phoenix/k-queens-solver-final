@@ -38,13 +38,11 @@ export default defineComponent({
     setup(props, context) {
         const moves = ref<Vue[]>([]);
 
-        onMounted(() => {
-            context.emit("moveRefsChanged", moves.value);
-        });
-
         onUpdated(() => {
-            // bus.$emit("movesMinConflict", moves.value);
-            context.emit("moveRefsChanged", moves.value);
+            context.emit(
+                "moveRefsChanged",
+                moves.value.map((vueComponent) => vueComponent.$el)
+            );
         });
 
         onBeforeUpdate(() => {
