@@ -8,13 +8,44 @@
                 :edgeLength="edgeLength"
                 :steps="steps"
             />
-            <GameActions
-                @randomize="randomize"
-                @solve="solve"
-                @reset="reset"
-                :speed="speed"
-                @speedChanged="(value) => (speed = value)"
-            />
+
+            <div class="pb-4 space-y-3">
+                <div class="text-center space-x-2">
+                    <button
+                        class="shadow-md btn btn-primary"
+                        @click="randomize"
+                    >Randomize</button>
+
+                    <button
+                        class="shadow-md btn btn-primary"
+                        @click="reset"
+                    >Reset</button>
+                </div>
+
+                <div class="text-center space-x-2">
+                    <button
+                        class="shadow-md btn btn-success"
+                        @click="solve"
+                    >Solve</button>
+                </div>
+
+                <div class="flex items-center w-full mx-auto sm:w-8/12 xl:w-6/12 space-x-4">
+                    <span class="font-semibold">Speed: </span>
+                    <VueSlider
+                        class="flex-grow"
+                        v-model="speedComputed"
+                        :data="['0.25x', '0.5x', '1x', '2x', '3x', '4x']"
+                        :marks="true"
+                        :absorb="true"
+                        :lazy="true"
+                    />
+                    <font-awesome-icon
+                        :icon="['fas', 'running']"
+                        size="lg"
+                        class="text-blue-600"
+                    ></font-awesome-icon>
+                </div>
+            </div>
         </div>
 
         <div class="w-full px-4 md:w-4/12">
@@ -24,11 +55,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, reactive } from "@vue/composition-api";
-import { bus } from "@/main";
+import { defineComponent, ref, computed, watch, reactive } from "@vue/composition-api";
+import VueSlider from "vue-slider-component";
+import "vue-slider-component/theme/default.css";
 import gsap from "gsap";
+import { bus } from "@/main";
 import * as interfaces from "@/interfaces/interfaces";
-import GameActions from "@/components/GameActions/GameActions.vue";
 import ChessBoard from "@/components/ChessBoard/ChessBoard.vue";
 import ListMoves from "@/components/ListMoves/ListMoves.vue";
 
@@ -36,7 +68,7 @@ export default defineComponent({
     name: "MinConflict",
 
     components: {
-        GameActions,
+        VueSlider,
         ChessBoard,
         ListMoves,
     },
@@ -101,9 +133,14 @@ export default defineComponent({
         // Speed
         const baseDuration = 0.5;
         const speed = ref<number>(1);
-        function speedChanged(value: number) {
-            speed.value = value;
-        }
+        const speedComputed = computed({
+            get: () => {
+                return speed.value + "x";
+            },
+            set: (value) => {
+                speed.value = parseFloat(value);
+            },
+        });
 
         // Template references
         const queens = ref<Element[] | Vue[]>([]);
@@ -179,7 +216,7 @@ export default defineComponent({
             edgeLength,
             steps,
             speed,
-            speedChanged,
+            speedComputed,
             randomize,
             reset,
             solve,
