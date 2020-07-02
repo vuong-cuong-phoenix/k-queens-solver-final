@@ -50,17 +50,10 @@ const secondIndividual: interfaces.Individual = {
     parents: [secondParent, firstIndividual],
 };
 
-export const generations: interfaces.Generation[] = [];
+export const generations: interfaces.Individual[] = [];
 
-generations.push({
-    individuals: [firstParent, secondParent],
-});
+generations.push(secondParent);
 
-generations.push({
-    individuals: [firstIndividual],
-});
+generations.push(firstIndividual);
 
-generations.push({
-    individuals: [secondIndividual],
-});
-
+generations.push(secondIndividual);
