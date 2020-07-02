@@ -45,8 +45,8 @@ def min_conflict_solve():
 @cross_origin()
 def ga():
     req_data = request.get_json()
-    nq = req_data['nq']
-    generation, time = solve(nq)
+    k = req_data['k']
+    generation, time = solve(k)
     response = app.response_class(
         response=json.dumps({"generation": generation, "time": time}),
         status=200,
