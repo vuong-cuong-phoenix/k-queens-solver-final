@@ -33,3 +33,12 @@ export interface MinConflictPostResponse {
     steps: Step[];
     time: number;
 }
+
+export interface GeneticAlgorithmPostRequest {
+    k: number;
+}
+
+export interface GeneticAlgorithmPostResponse {
+    generations: Individual[];
+    time: number;
+}
