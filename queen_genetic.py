@@ -3,6 +3,7 @@ import random
 from functools import reduce
 from itertools import groupby
 import time
+import json
 def random_chromosome(size): #making random chromosomes
     return [ random.randint(1, size) for _ in range(size)]
 
@@ -49,6 +50,7 @@ def natural_selection(population, new_population, maxFitness):
 def genetic_queen(population, fitness, maxFitness):
     mutation_probability = 0.03
     new_population = []
+    father, mother, best_child = None, None, None
     probabilities = [probability(n, fitness, maxFitness) for n in population]
     for _ in range(len(population)):
         x = random_pick(population, probabilities) #best chromosome 1
@@ -58,9 +60,13 @@ def genetic_queen(population, fitness, maxFitness):
             child = mutate(child)
         # print_chromosome(child)
         new_population.append(child)
+        if best_child is None:
+            father, mother, best_child = x, y, child
+        elif fitness(child, maxFitness) > fitness(best_child, maxFitness):
+            father, mother, best_child = x, y, child
         if fitness(child, maxFitness) == maxFitness: break
     new_population = natural_selection(population, new_population, maxFitness)
-    return new_population
+    return new_population, [father, mother, best_child]
 
 def print_chromosome(chrom):
     print("Chromosome = {},  Fitness = {}"
@@ -70,18 +76,24 @@ def solve(nq):
     start_time = time.time()
     maxFitness = (nq * (nq - 1)) / 2  # 8*7/2 = 28
     population = [random_chromosome(nq) for _ in range(100)]
-
+    ranks = sorted(population, key= lambda x: fitness(x, maxFitness), reverse= True)
+    initial = {'state':[{'x':y + 1,'y':z} for (y,z) in enumerate(ranks[0])], 'fitnessValue': fitness(ranks[0], maxFitness), 'parents':[]}
     generation = 1
     output = []
-    while not maxFitness in [fitness(chrom, maxFitness) for chrom in population]:
-        print("=== Generation {} ===".format(generation), len(population))
-        population = genetic_queen(population, fitness, maxFitness)
-        print("")
-        ranks = sorted([(x, i) for (i, x) in enumerate(population)], key=lambda item: (fitness(item[0], maxFitness), item[1]), reverse=True)[:2]
+    output.append(initial)
 
+    while not maxFitness in [fitness(chrom, maxFitness) for chrom in population]:
+        # print("=== Generation {} ===".format(generation), len(population))
+        population, generation_output = genetic_queen(population, fitness, maxFitness)
+        # print("")
+        # ranks = sorted([(x, i) for (i, x) in enumerate(population)], key=lambda item: (fitness(item[0], maxFitness), item[1]), reverse=True)[:2]
+        generation_output = list(map(lambda x: {'state':[{'x':y + 1,'y':z} for (y,z) in enumerate(x)], 'fitnessValue': fitness(x, maxFitness), 'parents': []}, generation_output))
         # print("Maximum Fitness = {}".format(max([fitness(n, maxFitness) for n in population])))
-        output.append([x[0] for x in ranks])
+        generation_output[-1]['parents'] = generation_output[:2]
+        output.append(generation_output[-1])
         generation += 1
+    # [print(x) for x in output]
+    print(json.dumps({"generation": output, "time": time.time() - start_time}, indent=4, sort_keys=True))
     return output, time.time() - start_time
     # chrom_out = []
     # print("Solved in Generation {}!".format(generation - 1))
@@ -92,7 +104,8 @@ def solve(nq):
     #         chrom_out = chrom
     #         print_chromosome(chrom)
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    solve(5)
     # nq = int(input("Enter Number of Queens: ")) #say N = 8
     # maxFitness = (nq*(nq-1))/2  # 8*7/2 = 28
     # population = [random_chromosome(nq) for _ in range(100)]
