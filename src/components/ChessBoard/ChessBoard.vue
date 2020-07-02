@@ -1,10 +1,10 @@
 <template>
     <div class="mt-16 mb-10 md:mt-24">
         <div
-            class="relative mx-auto board"
+            class="relative mx-auto"
             :style="{ 
-                height: kNumber * edgeLength + 'rem',
-                width: kNumber * edgeLength + 'rem',
+                height: (kNumber * edgeLength) + 'rem',
+                width: (kNumber * edgeLength) + 'rem',
             }"
         >
             <ChessBoardLegend
@@ -25,10 +25,6 @@
             <Queens
                 :kNumber="kNumber"
                 :edgeLength="edgeLength"
-                :initPosition="{
-                    x: 0,
-                    y: 0
-                }"
             />
         </div>
     </div>
@@ -73,5 +69,3 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-</style>
