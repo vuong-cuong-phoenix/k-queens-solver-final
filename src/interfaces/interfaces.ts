@@ -14,3 +14,13 @@ export interface Step {
     destination: Position;
 }
 
+export interface Individual {
+    state: Position[];
+    fitnessValue: number;
+    parents: [Individual, Individual] | [];
+}
+
+export interface Generation {
+    individuals: Individual[];
+}
+
