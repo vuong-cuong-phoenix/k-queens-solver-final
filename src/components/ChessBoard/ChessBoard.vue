@@ -33,8 +33,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted, onBeforeUpdate } from "@vue/composition-api";
-import { bus } from "@/main";
+import { defineComponent, computed } from "@vue/composition-api";
 import * as interfaces from "@/interfaces/interfaces";
 import ChessBoardLegend from "@/components/ChessBoard/ChessBoardLegend/ChessBoardLegend.vue";
 import Board from "@/components/ChessBoard/Board/Board.vue";
@@ -68,11 +67,6 @@ export default defineComponent({
             required: false,
             default: false,
         },
-        steps: {
-            type: Array as () => interfaces.Step[],
-            required: false,
-            default: () => [],
-        },
         initPosition: {
             type: Array as () => interfaces.Position[],
             required: false,
@@ -86,10 +80,10 @@ export default defineComponent({
             if (!result) {
                 result = [];
 
-                for (let i = 0; i <= props.kNumber; ++i) {
+                for (let i = 1; i <= props.kNumber; ++i) {
                     result.push({
-                        x: 0,
-                        y: 0,
+                        x: i,
+                        y: 1,
                     });
                 }
             }
@@ -103,4 +97,3 @@ export default defineComponent({
     },
 });
 </script>
-

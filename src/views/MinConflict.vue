@@ -7,7 +7,6 @@
                 :showLegends="true"
                 :kNumber="kNumber"
                 :edgeLength="edgeLength"
-                :steps="steps"
             />
 
             <!-- Game actions -->
@@ -61,7 +60,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, reactive, watchEffect } from "@vue/composition-api";
+import { defineComponent, ref, computed, watch, reactive } from "@vue/composition-api";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/default.css";
 import gsap from "gsap";
@@ -101,7 +100,15 @@ export default defineComponent({
         const kNumber = ref<number>(4);
         const edgeLength = ref<number>(4);
 
-        const currentState = ref<interfaces.Position[]>([]);
+        // Initialize state
+        const initialState: interfaces.Position[] = [];
+        for (let i = 1; i <= kNumber.value; ++i) {
+            initialState.push({
+                x: i,
+                y: 1,
+            });
+        }
+        const currentState = ref<interfaces.Position[]>(initialState);
 
         const steps = ref<interfaces.Step[]>([]);
 
@@ -144,8 +151,8 @@ export default defineComponent({
                 const row = Math.floor(Math.random() * (kNumber.value - 1)) + 1;
 
                 gsap.to(queenRefs.value[col - 1], {
-                    x: `${col * edgeLength.value}rem`,
-                    y: `${row * edgeLength.value}rem`,
+                    // x: `${col * edgeLength.value}rem`,
+                    y: `${(row - initialState[0].y) * edgeLength.value}rem`,
                     ease: "none",
                     duration: 0.5,
                     force3D: false,
@@ -161,10 +168,10 @@ export default defineComponent({
         }
 
         function reset() {
-            currentState.value = [];
+            currentState.value = initialState;
 
             gsap.to(queenRefs.value, {
-                x: 0,
+                // x: 0,
                 y: 0,
                 ease: "none",
                 duration: 0.25,
@@ -175,17 +182,9 @@ export default defineComponent({
         }
 
         async function solve() {
-            const initState = currentState.value.map((pos) => pos.y - 1);
-
-            if (initState.length === 0) {
-                for (let i = 0; i < kNumber.value; ++i) {
-                    initState.push(0);
-                }
-            }
-
             const postData: interfaces.MinConflictPostRequest = {
                 k: kNumber.value,
-                initState: initState,
+                initState: currentState.value.map((pos) => pos.y - 1),
                 iteration: 1000 * kNumber.value,
             };
 
@@ -206,8 +205,8 @@ export default defineComponent({
             console.log("[watch] 'steps' changed...");
             curr.forEach((step) => {
                 timelines.queens.to(queenRefs.value[step.choice.x - 1], {
-                    x: `${step.choice.x * edgeLength.value}rem`,
-                    y: `${step.choice.y * edgeLength.value}rem`,
+                    //x: `${step.choice.x * edgeLength.value}rem`,
+                    y: `${(step.choice.y - initialState[0].y) * edgeLength.value}rem`,
                     duration: baseDuration,
                 });
             });
@@ -233,7 +232,6 @@ export default defineComponent({
             kNumber,
             edgeLength,
             steps,
-            speed,
             speedComputed,
             moveRefs,
             randomize,

@@ -10,14 +10,13 @@
                         class="w-6/12 p-4 md:w-full md:p-12"
                     >
                         <ChessBoard
-                            ref="parentsRef"
+                            ref="parentRefs"
                             class="mx-auto"
                             :kNumber="kNumber"
                             :edgeLength="edgeLength"
                             :isStatic="true"
                             :initPosition="parentsComputed[i - 1].state"
                         />
-                        <!-- :initPosition="currentIndividual.parents[i - 1].state" -->
                     </div>
                 </div>
             </div>
@@ -114,15 +113,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted, computed, watch, onBeforeUpdate } from "@vue/composition-api";
+import { defineComponent, ref, reactive, onMounted, computed, watch } from "@vue/composition-api";
 import gsap from "gsap";
 import axios, { AxiosResponse } from "axios";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/default.css";
 import ChessBoard from "@/components/ChessBoard/ChessBoard.vue";
-import { bus } from "@/main";
 import * as interfaces from "@/interfaces/interfaces";
-import * as simulation from "@/simulation/genetic-algorithm";
 
 export default defineComponent({
     name: "GeneticAlgorithm",
@@ -183,7 +180,7 @@ export default defineComponent({
         });
 
         // Speed
-        const baseDuration = 2;
+        const baseDuration = 1;
         const speed = ref<number>(1);
         const speedComputed = computed({
             get: () => {
@@ -195,7 +192,7 @@ export default defineComponent({
         });
 
         // Template references
-        const parentsRef = ref<Vue[]>([]);
+        const parentRefs = ref<Vue[]>([]);
         const individualRef = ref<Vue>();
 
         async function solve() {
@@ -216,39 +213,46 @@ export default defineComponent({
         }
 
         function reset() {
-            const resetTimeline = gsap.timeline({
-                defaults: {
-                    force3D: false,
-                },
-            });
+            if (generations.value.length !== 0) {
+                const resetTimeline = gsap.timeline({
+                    defaults: {
+                        force3D: false,
+                    },
+                });
 
-            resetTimeline.to([parentsRef.value[0].$el, parentsRef.value[1].$el, individualRef.value!.$el], {
-                opacity: 0,
-                duration: 0.5,
-                onComplete: () => {
-                    currentIndividual.value = {
-                        state: initialState,
-                        fitnessValue: 0,
-                        parents: [],
-                    };
-                },
-            });
+                resetTimeline.to([parentRefs.value[0].$el, parentRefs.value[1].$el, individualRef.value!.$el], {
+                    opacity: 0,
+                    duration: 0.5,
+                    onComplete: () => {
+                        currentIndividual.value = {
+                            state: initialState,
+                            fitnessValue: 0,
+                            parents: [],
+                        };
+                        generations.value = [];
+                    },
+                });
 
-            resetTimeline.to([parentsRef.value[0].$el, parentsRef.value[1].$el, individualRef.value!.$el], {
-                opacity: 1,
-                duration: 1,
-            });
+                resetTimeline.to([parentRefs.value[0].$el, parentRefs.value[1].$el, individualRef.value!.$el], {
+                    opacity: 1,
+                    duration: 1,
+                });
+            }
         }
 
         // Animate whenever getting a solution
         watch(generations, (curr) => {
             console.log("[watch] 'generations' changed...");
             // Start animations
+            if (curr.length === 0) {
+                return;
+            }
+
             timelines.generateIcon.play();
 
             curr.forEach((gen) => {
                 // Hide all first
-                timelines.boards.to([parentsRef.value[0].$el, parentsRef.value[1].$el, individualRef.value!.$el], {
+                timelines.boards.to([parentRefs.value[0].$el, parentRefs.value[1].$el, individualRef.value!.$el], {
                     opacity: 0,
                     duration: 0.5,
                     onComplete: () => {
@@ -258,7 +262,7 @@ export default defineComponent({
                 // Dummy animation to delay before animate Parents
                 timelines.boards.to(individualRef.value!.$el, { duration: 0.25 });
                 // Then animate Parents
-                timelines.boards.to([parentsRef.value[0].$el, parentsRef.value[1].$el], {
+                timelines.boards.to([parentRefs.value[0].$el, parentRefs.value[1].$el], {
                     opacity: 1,
                     duration: baseDuration,
                 });
@@ -283,7 +287,7 @@ export default defineComponent({
             // Initialize animation for 'generateIcon'
             timelines.generateIcon.to("#generateGradient stop", {
                 repeat: -1,
-                repeatDelay: 2,
+                repeatDelay: baseDuration,
                 yoyo: true,
                 stopColor: "#ff80b3",
             });
@@ -293,11 +297,10 @@ export default defineComponent({
         return {
             kNumber,
             edgeLength,
-            crossOverPoint,
             speedComputed,
             currentIndividual,
             parentsComputed,
-            parentsRef,
+            parentRefs,
             individualRef,
             solve,
             reset,
