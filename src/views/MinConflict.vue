@@ -1,26 +1,28 @@
 <template>
-    <div class="flex flex-wrap">
-        <div class="w-full md:w-9/12">
-            <GameActions
-                @randomize="randomize"
-                @solve="solve"
-                @reset="reset"
-            />
+    <div class="flex flex-wrap -mx-4">
+        <div class="w-full px-4 md:w-8/12">
             <ChessBoard
                 :kNumber="kNumber"
                 :edgeLength="edgeLength"
                 :steps="steps"
             />
+            <GameActions
+                @randomize="randomize"
+                @solve="solve"
+                @reset="reset"
+                :speed="speed"
+                @speedChanged="value => speed = value"
+            />
         </div>
 
-        <div class="w-full md:w-3/12">
-            <ListMoves :steps="[...randomSteps, ...steps]" />
+        <div class="w-full px-4 md:w-4/12">
+            <ListMoves :steps="steps" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onBeforeUpdate } from "@vue/composition-api";
+import { defineComponent, ref, onMounted, onBeforeUpdate, watch, reactive } from "@vue/composition-api";
 import { bus } from "@/main";
 import gsap from "gsap";
 import * as interfaces from "@/interfaces/interfaces";
@@ -38,37 +40,26 @@ export default defineComponent({
     },
 
     setup(props, context) {
+        // Initial objects
+        const timelines = reactive({
+            queens: gsap.timeline({
+                default: {
+                    ease: "none",
+                    force3D: false,
+                },
+            }),
+            moves: gsap.timeline({
+                default: {
+                    ease: "none",
+                    force3D: false,
+                },
+            }),
+        });
+
+        // Essentials
         const kNumber = ref<number>(4);
 
         const edgeLength = ref<number>(4);
-
-        const queens = ref<Element[] | Vue[]>([]);
-        bus.$on("queensMinConflict", (queensRef: Element[] | Vue[]) => (queens.value = queensRef));
-
-        const timelineQueens = ref(
-            gsap.timeline({
-                defaults: {
-                    duration: 0.5,
-                    ease: "none",
-                    force3D: false,
-                },
-            })
-        );
-
-        const moves = ref<Element[] | Vue[]>([]);
-        bus.$on("movesMinConflict", (movesRef: Element[] | Vue[]) => (moves.value = movesRef));
-
-        const timelineMoves = ref(
-            gsap.timeline({
-                defaults: {
-                    duration: 0.5,
-                    ease: "none",
-                    force3D: false,
-                },
-            })
-        );
-
-        const randomSteps = ref<interfaces.Step[]>([]);
 
         const steps = ref<interfaces.Step[]>([
             {
@@ -105,11 +96,32 @@ export default defineComponent({
             },
         ]);
 
-        const speed = ref<number>(500);
+        // Speed
+        const baseDuration = 0.5;
+        const speed = ref<number>(1);
+        function speedChanged(value: number) {
+            speed.value = value;
+        }
 
+        // Template references
+        const queens = ref<Element[] | Vue[]>([]);
+        bus.$on("queensMinConflict", (queensRef: Element[] | Vue[]) => (queens.value = queensRef));
+
+        const moves = ref<Element[] | Vue[]>([]);
+        bus.$on("movesMinConflict", (movesRef: Element[] | Vue[]) => (moves.value = movesRef));
+
+        // Helper functions
+        function resetMoves() {
+            steps.value.forEach((_, index) => {
+                gsap.to((moves.value[index] as Vue).$el, {
+                    opacity: 0,
+                    duration: 0.25,
+                });
+            });
+        }
+
+        // Game actions
         function randomize() {
-            randomSteps.value = [];
-
             for (let col = 1; col <= kNumber.value; ++col) {
                 const row = Math.floor(Math.random() * (kNumber.value - 1)) + 1;
 
@@ -117,35 +129,15 @@ export default defineComponent({
                     x: `${col * edgeLength.value}rem`,
                     y: `${row * edgeLength.value}rem`,
                     ease: "none",
-                    duration: speed.value / 1000,
+                    duration: 0.5,
                     force3D: false,
                 });
-
-                randomSteps.value.push({
-                    conflicts: [],
-                    queen: col,
-                    destination: {
-                        x: col,
-                        y: row,
-                    },
-                });
-
-                gsap.fromTo(
-                    (moves.value[col - 1] as Vue).$el,
-                    {
-                        opacity: 0,
-                    },
-                    {
-                        opacity: 1,
-                        duration: speed.value / 1000,
-                    }
-                );
             }
+
+            resetMoves();
         }
 
         function reset() {
-            randomSteps.value = [];
-
             for (let i = 0; i < kNumber.value; ++i) {
                 gsap.to(queens.value[i], {
                     x: 0,
@@ -155,30 +147,37 @@ export default defineComponent({
                     force3D: false,
                 });
             }
+
+            resetMoves();
         }
 
         function solve() {
             steps.value.forEach((step, index) => {
-                timelineQueens.value.to(queens.value[step.queen - 1], {
+                timelines.queens.to(queens.value[step.queen - 1], {
                     x: `${step.destination.x * edgeLength.value}rem`,
                     y: `${step.destination.y * edgeLength.value}rem`,
+                    duration: baseDuration,
                 });
 
-                timelineMoves.value.to((moves.value[kNumber.value + index] as Vue).$el, {
+                timelines.moves.to((moves.value[index] as Vue).$el, {
                     opacity: 1,
+                    duration: baseDuration,
                 });
             });
         }
 
-        onMounted(() => {
-            console.log("abc");
+        // Funtionalities
+        watch(speed, (curr, prev) => {
+            timelines.queens.timeScale(curr);
+            timelines.moves.timeScale(curr);
         });
 
         return {
             kNumber,
             edgeLength,
             steps,
-            randomSteps,
+            speed,
+            speedChanged,
             randomize,
             reset,
             solve,
