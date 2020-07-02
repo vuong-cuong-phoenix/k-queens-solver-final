@@ -52,7 +52,10 @@
 
         <!-- List of steps -->
         <div class="w-full px-4 md:w-4/12">
-            <ListMoves :steps="steps" />
+            <ListMoves
+                :steps="steps"
+                @moveRefsChanged="(moveElements) => moves = moveElements"
+            />
         </div>
     </div>
 </template>
@@ -62,6 +65,7 @@ import { defineComponent, ref, computed, watch, reactive } from "@vue/compositio
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/default.css";
 import gsap from "gsap";
+import axios from "axios";
 import { bus } from "@/main";
 import * as interfaces from "@/interfaces/interfaces";
 import ChessBoard from "@/components/ChessBoard/ChessBoard.vue";
@@ -98,40 +102,9 @@ export default defineComponent({
 
         const edgeLength = ref<number>(4);
 
-        const steps = ref<interfaces.Step[]>([
-            {
-                conflicts: [],
-                queen: 1,
-                destination: {
-                    x: 1,
-                    y: 2,
-                },
-            },
-            {
-                conflicts: [],
-                queen: 2,
-                destination: {
-                    x: 2,
-                    y: 4,
-                },
-            },
-            {
-                conflicts: [],
-                queen: 3,
-                destination: {
-                    x: 3,
-                    y: 1,
-                },
-            },
-            {
-                conflicts: [],
-                queen: 4,
-                destination: {
-                    x: 4,
-                    y: 3,
-                },
-            },
-        ]);
+        const currentState = ref<interfaces.Position[]>([]);
+
+        const steps = ref<interfaces.Step[]>([]);
 
         // Speed
         const baseDuration = 0.5;
@@ -149,8 +122,7 @@ export default defineComponent({
         const queens = ref<Element[] | Vue[]>([]);
         bus.$on("queensMinConflict", (queensRef: Element[] | Vue[]) => (queens.value = queensRef));
 
-        const moves = ref<Element[] | Vue[]>([]);
-        bus.$on("movesMinConflict", (movesRef: Element[] | Vue[]) => (moves.value = movesRef));
+        const moves = ref<Vue[]>([]);
 
         // Helper functions
         function resetMoves() {
@@ -164,6 +136,8 @@ export default defineComponent({
 
         // Game actions
         function randomize() {
+            currentState.value = [];
+
             for (let col = 1; col <= kNumber.value; ++col) {
                 const row = Math.floor(Math.random() * (kNumber.value - 1)) + 1;
 
@@ -174,12 +148,19 @@ export default defineComponent({
                     duration: 0.5,
                     force3D: false,
                 });
+
+                currentState.value.push({
+                    x: col,
+                    y: row,
+                });
             }
 
             resetMoves();
         }
 
         function reset() {
+            currentState.value = [];
+
             for (let i = 0; i < kNumber.value; ++i) {
                 gsap.to(queens.value[i], {
                     x: 0,
@@ -194,18 +175,38 @@ export default defineComponent({
         }
 
         function solve() {
-            steps.value.forEach((step, index) => {
-                timelines.queens.to(queens.value[step.queen - 1], {
-                    x: `${step.destination.x * edgeLength.value}rem`,
-                    y: `${step.destination.y * edgeLength.value}rem`,
-                    duration: baseDuration,
-                });
+            let initState = currentState.value.map((pos) => pos.y - 1);
 
-                timelines.moves.to((moves.value[index] as Vue).$el, {
-                    opacity: 1,
-                    duration: baseDuration,
+            if (initState.length === 0) {
+                initState = [0, 0, 0, 0];
+            }
+
+            const postData: interfaces.MinConflictPost = {
+                k: kNumber.value,
+                initState: initState,
+                iteration: 1000 * kNumber.value,
+            };
+
+            axios
+                .post("http://localhost:5000/min-conflict", postData)
+                .then((response) => {
+                    const resultSteps: interfaces.Step[] = response.data.steps;
+                    steps.value = resultSteps;
+
+                    console.log("initState:", initState);
+                    console.log(steps.value);
+
+                    steps.value.forEach((step, index) => {
+                        timelines.queens.to(queens.value[step.choice.x - 1], {
+                            x: `${step.choice.x * edgeLength.value}rem`,
+                            y: `${step.choice.y * edgeLength.value}rem`,
+                            duration: baseDuration,
+                        });
+                    });
+                })
+                .catch((error) => {
+                    console.log(error);
                 });
-            });
         }
 
         // Funtionalities
@@ -214,12 +215,22 @@ export default defineComponent({
             timelines.moves.timeScale(curr);
         });
 
+        watch(moves, (curr) => {
+            steps.value.forEach((step, index) => {
+                timelines.moves.to(curr[index].$el, {
+                    opacity: 1,
+                    duration: baseDuration,
+                });
+            });
+        });
+
         return {
             kNumber,
             edgeLength,
             steps,
             speed,
             speedComputed,
+            moves,
             randomize,
             reset,
             solve,

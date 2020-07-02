@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onBeforeUpdate } from "@vue/composition-api";
+import { defineComponent, ref, onMounted, onBeforeUpdate, onUpdated } from "@vue/composition-api";
 import * as interfaces from "@/interfaces/interfaces";
 import ListMovesItem from "@/components/ListMoves/ListMovesItem/ListMovesItem.vue";
 import { bus } from "@/main";
@@ -36,10 +36,15 @@ export default defineComponent({
     },
 
     setup(props, context) {
-        const moves = ref<Element[] | Vue[]>([]);
+        const moves = ref<Vue[]>([]);
 
         onMounted(() => {
-            bus.$emit("movesMinConflict", moves.value);
+            context.emit("moveRefsChanged", moves.value);
+        });
+
+        onUpdated(() => {
+            // bus.$emit("movesMinConflict", moves.value);
+            context.emit("moveRefsChanged", moves.value);
         });
 
         onBeforeUpdate(() => {
