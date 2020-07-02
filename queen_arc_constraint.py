@@ -21,5 +21,5 @@ class QueenArcConstraint(Constraint[int, int]):
 
     def get_conflicted(self, assignment: Dict[int, int]) -> List[V]:
         if not self.is_satisfied(assignment):
-            return [self.q2]
+            return [self.q1, self.q2]
         return []
