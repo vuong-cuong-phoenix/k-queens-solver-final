@@ -1,13 +1,13 @@
 <template>
     <div>
         <div
-            v-for="queen in kNumber"
-            :key="queen"
+            v-for="i in kNumber"
+            :key="i"
             ref="queens"
             class="absolute flex items-center justify-center"
             :style="{ 
-                        left: (-edgeLength + (initPosition.x * edgeLength)) + 'rem',
-                        top: (-edgeLength + (initPosition.y * edgeLength)) + 'rem',
+                        left: (-edgeLength + (initPositionComputed[i-1].x * edgeLength)) + 'rem',
+                        top: (-edgeLength + (initPositionComputed[i-1].y * edgeLength)) + 'rem',
                         height: edgeLength  + 'rem',
                         width: edgeLength + 'rem',
                     }"
@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, onBeforeUpdate } from "@vue/composition-api";
+import { defineComponent, ref, onMounted, onBeforeUpdate, computed } from "@vue/composition-api";
 import * as interfaces from "@/interfaces/interfaces";
 import { bus } from "@/main";
 
@@ -48,14 +48,8 @@ export default defineComponent({
             required: true,
         },
         initPosition: {
-            type: Object as () => interfaces.Position,
+            type: Array as () => interfaces.Position[],
             required: false,
-            default: () => {
-                return {
-                    x: 0,
-                    y: 0,
-                } as interfaces.Position;
-            },
         },
         isStatic: {
             type: Boolean,
@@ -66,6 +60,23 @@ export default defineComponent({
 
     setup(props, context) {
         const queens = ref<Element[] | Vue[]>([]);
+
+        const initPositionComputed = computed(() => {
+            let result = props.initPosition;
+
+            if (!result) {
+                result = [];
+
+                for (let i = 0; i <= props.kNumber; ++i) {
+                    result.push({
+                        x: 0,
+                        y: 0,
+                    });
+                }
+            }
+
+            return result;
+        });
 
         onMounted(() => {
             if (!props.isStatic) {
@@ -79,6 +90,7 @@ export default defineComponent({
 
         return {
             queens,
+            initPositionComputed,
         };
     },
 });

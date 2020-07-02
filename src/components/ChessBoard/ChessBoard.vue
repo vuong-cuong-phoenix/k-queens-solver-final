@@ -1,32 +1,33 @@
 <template>
-    <div class="mt-16 mb-10 md:mt-24">
-        <div
-            class="relative mx-auto"
-            :style="{ 
-                height: (kNumber * edgeLength) + 'rem',
-                width: (kNumber * edgeLength) + 'rem',
-            }"
-        >
-            <ChessBoardLegend
-                :isRow="true"
-                :kNumber="kNumber"
-                :edgeLength="edgeLength"
-            />
-            <ChessBoardLegend
-                :kNumber="kNumber"
-                :edgeLength="edgeLength"
-            />
+    <div
+        class="relative mx-auto mt-16 mb-10 md:mt-24"
+        :style="{ 
+            height: (kNumber * edgeLength) + 'rem',
+            width: (kNumber * edgeLength) + 'rem',
+        }"
+    >
+        <ChessBoardLegend
+            v-if="showLegends"
+            :isRow="true"
+            :kNumber="kNumber"
+            :edgeLength="edgeLength"
+        />
+        <ChessBoardLegend
+            v-if="showLegends"
+            :kNumber="kNumber"
+            :edgeLength="edgeLength"
+        />
 
-            <Board
-                :kNumber="kNumber"
-                :edgeLength="edgeLength"
-            />
+        <Board
+            :kNumber="kNumber"
+            :edgeLength="edgeLength"
+        />
 
-            <Queens
-                :kNumber="kNumber"
-                :edgeLength="edgeLength"
-            />
-        </div>
+        <Queens
+            :kNumber="kNumber"
+            :edgeLength="edgeLength"
+            :isStatic="isStatic"
+        />
     </div>
 </template>
 
@@ -56,15 +57,21 @@ export default defineComponent({
             type: Number,
             required: true,
         },
+        isStatic: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        showLegends: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
         steps: {
             type: Array as () => interfaces.Step[],
             required: false,
             default: () => [],
         },
-    },
-
-    setup(props, context) {
-        return {};
     },
 });
 </script>
