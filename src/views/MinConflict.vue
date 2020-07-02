@@ -1,15 +1,17 @@
 <template>
     <div class="flex flex-wrap -mx-4">
         <div class="w-full px-4 md:w-8/12">
+            <!-- Main Chess's board -->
             <ChessBoard
-                class="mx-auto mt-16 mb-10 md:mt-24"
+                class="mx-auto mt-16 md:mt-24"
                 :showLegends="true"
                 :kNumber="kNumber"
                 :edgeLength="edgeLength"
                 :steps="steps"
             />
 
-            <div class="pb-4 space-y-3">
+            <!-- Game actions -->
+            <div class="mt-10 space-y-3 ">
                 <div class="text-center space-x-2">
                     <button
                         class="shadow-md btn btn-primary"
@@ -29,7 +31,7 @@
                     >Solve</button>
                 </div>
 
-                <div class="flex items-center w-full mx-auto sm:w-8/12 xl:w-6/12 space-x-4">
+                <div class="flex items-center w-full pb-4 mx-auto sm:w-8/12 xl:w-6/12 space-x-4">
                     <span class="font-semibold">Speed: </span>
                     <VueSlider
                         class="flex-grow"
@@ -48,6 +50,7 @@
             </div>
         </div>
 
+        <!-- List of steps -->
         <div class="w-full px-4 md:w-4/12">
             <ListMoves :steps="steps" />
         </div>
