@@ -41,14 +41,14 @@ def min_conflict_solve():
     return response
 
 
-@app.route('/ga', methods=['POST'])
+@app.route('/genetic-algorithm', methods=['POST'])
 @cross_origin()
 def ga():
     req_data = request.get_json()
     k = req_data['k']
-    generation, time = solve(k)
+    generations, time = solve(k)
     response = app.response_class(
-        response=json.dumps({"generation": generation, "time": time}),
+        response=json.dumps({"generations": generations, "time": time}),
         status=200,
         mimetype='application/json'
     )
