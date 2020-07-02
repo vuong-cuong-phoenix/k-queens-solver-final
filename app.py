@@ -30,7 +30,7 @@ def min_conflict_solve():
                                                       iteration)
     solution, steps, time = min_conflict.solve()
     response = app.response_class(
-        response=json.dumps({"solution": solution.assignment, "steps": steps, "time": time}),
+        response=json.dumps({"steps": steps, "time": time}),
         status=200,
         mimetype='application/json'
     )

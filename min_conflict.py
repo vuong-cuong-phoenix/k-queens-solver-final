@@ -27,12 +27,12 @@ class MinConflict(Generic[V, D]):
             _: int
             best_value: D
             possible_values = [(csp.conflict_value(choice, value), value) for value in csp.domains[choice]]
-            _, best_value = min(possible_values, key=lambda x: (x[0], random.random))
+            col, best_value = min(possible_values, key=lambda x: (x[0], random.random))
             if history.count(csp.current_state.next_state(choice, best_value)) > 3:  # repeat too many time?
-                new_domain = filter(lambda x: x != best_value, csp.domains[choice])
-                possible_values = [(csp.conflict_value(choice, value), value) for value in new_domain]
-                _, best_value = min(possible_values, key=lambda x: (x[0], random.random))  # find a new best_value
-            steps.append({"choice": (choice, best_value), "conflict_val": [value[0] for value in possible_values]})
+                new_values = possible_values.copy()
+                new_values.remove((col, best_value))
+                _, best_value = min(new_values, key=lambda x: (x[0], random.random))  # find a new best_value
+            steps.append({"choice": {"x": choice+1, "y": best_value+1}, "conflicts": [{"position": {"x": choice+1, "y": i + 1}, "value": value[0]} for i, value in enumerate(possible_values)]})
             csp.current_state = csp.current_state.next_state(choice, best_value)
             if len(history) == 10:  # enforce recent 10 histories
                 history = history[1:] + [csp.current_state]
