@@ -54,7 +54,7 @@
         <div class="w-full px-4 md:w-4/12">
             <ListMoves
                 :steps="steps"
-                @moveRefsChanged="(moveElements) => moves = moveElements"
+                @moveRefsChanged="(refs) => moveRefs = refs"
             />
         </div>
     </div>
@@ -99,7 +99,6 @@ export default defineComponent({
 
         // Essentials
         const kNumber = ref<number>(4);
-
         const edgeLength = ref<number>(4);
 
         const currentState = ref<interfaces.Position[]>([]);
@@ -119,15 +118,15 @@ export default defineComponent({
         });
 
         // Template references
-        const queens = ref<Element[]>([]);
-        bus.$on("queenRefs", (queensRef: Element[]) => (queens.value = queensRef));
+        const queenRefs = ref<Element[]>([]);
+        bus.$on("queenRefs", (refs: Element[]) => (queenRefs.value = refs));
 
-        const moves = ref<Element[]>([]);
+        const moveRefs = ref<Element[]>([]);
 
         // Helper functions
         function resetMoves() {
-            if (moves.value.length !== 0) {
-                gsap.to(moves.value, {
+            if (moveRefs.value.length !== 0) {
+                gsap.to(moveRefs.value, {
                     opacity: 0,
                     duration: 0.25,
                     onComplete: () => {
@@ -144,7 +143,7 @@ export default defineComponent({
             for (let col = 1; col <= kNumber.value; ++col) {
                 const row = Math.floor(Math.random() * (kNumber.value - 1)) + 1;
 
-                gsap.to(queens.value[col - 1], {
+                gsap.to(queenRefs.value[col - 1], {
                     x: `${col * edgeLength.value}rem`,
                     y: `${row * edgeLength.value}rem`,
                     ease: "none",
@@ -164,7 +163,7 @@ export default defineComponent({
         function reset() {
             currentState.value = [];
 
-            gsap.to(queens.value, {
+            gsap.to(queenRefs.value, {
                 x: 0,
                 y: 0,
                 ease: "none",
@@ -197,16 +196,16 @@ export default defineComponent({
                 );
 
                 steps.value = response.data.steps;
-            } catch (error) {
-                console.error(error);
+            } catch (err) {
+                console.error(err);
             }
         }
 
         // Animate whenever getting a solution
         watch(steps, (curr) => {
-            console.log("[watch] 'steps' running...");
+            console.log("[watch] 'steps' changed...");
             curr.forEach((step) => {
-                timelines.queens.to(queens.value[step.choice.x - 1], {
+                timelines.queens.to(queenRefs.value[step.choice.x - 1], {
                     x: `${step.choice.x * edgeLength.value}rem`,
                     y: `${step.choice.y * edgeLength.value}rem`,
                     duration: baseDuration,
@@ -214,8 +213,8 @@ export default defineComponent({
             });
         });
 
-        watch(moves, (curr) => {
-            console.log("[watch] 'moves' running...");
+        watch(moveRefs, (curr) => {
+            console.log("[watch] 'moveRefs' changed...");
             curr.forEach((element) => {
                 timelines.moves.to(element, {
                     opacity: 1,
@@ -236,7 +235,7 @@ export default defineComponent({
             steps,
             speed,
             speedComputed,
-            moves,
+            moveRefs,
             randomize,
             reset,
             solve,
