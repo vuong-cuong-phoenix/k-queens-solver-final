@@ -1,6 +1,9 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
+import MinConflict from "../views/MinConflict.vue";
+import GeneticAlgorithm from "../views/MinConflict.vue";
+import About from "../views/MinConflict.vue";
 
 Vue.use(VueRouter);
 
@@ -13,17 +16,17 @@ const routes: Array<RouteConfig> = [
     {
         path: "/min-conflict",
         name: "MinConflict",
-        component: () => import("@/views/MinConflict.vue"),
+        component: MinConflict,
     },
     {
         path: "/genetic-algorithm",
         name: "GeneticAlgorithm",
-        component: () => import("@/views/GeneticAlgorithm.vue"),
+        component: GeneticAlgorithm,
     },
     {
         path: "/about",
         name: "About",
-        component: () => import(/* webpackChunkName: "about" */ "../views/About.vue"),
+        component: About,
     },
 ];
 
