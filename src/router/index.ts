@@ -2,8 +2,8 @@ import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import Home from "../views/Home.vue";
 import MinConflict from "../views/MinConflict.vue";
-import GeneticAlgorithm from "../views/MinConflict.vue";
-import About from "../views/MinConflict.vue";
+import GeneticAlgorithm from "../views/GeneticAlgorithm.vue";
+import About from "../views/About.vue";
 
 Vue.use(VueRouter);
 
