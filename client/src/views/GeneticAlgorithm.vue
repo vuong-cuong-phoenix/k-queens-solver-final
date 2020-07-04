@@ -242,7 +242,6 @@ export default defineComponent({
 
         // Animate whenever getting a solution
         watch(generations, (curr) => {
-            console.log("[watch] 'generations' changed...", curr);
             // Start animations
             if (curr.length === 0) {
                 return;
@@ -279,7 +278,6 @@ export default defineComponent({
 
         // Change animation's speed
         watch(speed, (curr) => {
-            console.log("[watch] 'speed' changed...", curr);
             timelines.boards.timeScale(curr);
             timelines.generateIcon.timeScale(curr);
         });

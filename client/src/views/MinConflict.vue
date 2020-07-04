@@ -202,7 +202,6 @@ export default defineComponent({
 
         // Animate whenever getting a solution
         watch(steps, (curr) => {
-            console.log("[watch] 'steps' changed...", curr);
             curr.forEach((step) => {
                 timelines.queens.to(queenRefs.value[step.choice.x - 1], {
                     //x: `${step.choice.x * edgeLength.value}rem`,
@@ -213,7 +212,6 @@ export default defineComponent({
         });
 
         watch(moveRefs, (curr) => {
-            console.log("[watch] 'moveRefs' changed...", curr);
             curr.forEach((element) => {
                 timelines.moves.to(element, {
                     opacity: 1,
@@ -224,7 +222,6 @@ export default defineComponent({
 
         // Change animation's speed
         watch(speed, (curr) => {
-            console.log("[watch] 'speed' changed...", curr);
             timelines.queens.timeScale(curr);
             timelines.moves.timeScale(curr);
         });
