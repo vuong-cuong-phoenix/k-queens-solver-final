@@ -1,41 +1,25 @@
-# K-Queens Solver
+# VueJS Client for K-Queens Solver
 
-## Project setup
+## Prerequisites
 
-```
-yarn install
-```
+1.  **yarn**
 
-### Compiles and hot-reloads for development
+## Installation
 
-```
-yarn serve
-```
+1.  Install required packages with **yarn**:
 
-### Compiles and minifies for production
-
-```
-yarn build
+```shell
+$ yarn install
 ```
 
-### Run your unit tests
+2.  Compiles & run the app in development mode (hot-reloads):
 
-```
-yarn test:unit
-```
-
-### Run your end-to-end tests
-
-```
-yarn test:e2e
+```shell
+$ yarn serve
 ```
 
-### Lints and fixes files
+3.  Compiles and minifies for production:
 
+```shell
+$ yarn build
 ```
-yarn lint
-```
-
-### Customize configuration
-
-See [Configuration Reference](https://cli.vuejs.org/config/).
