@@ -12,6 +12,16 @@
             <!-- Game actions -->
             <div class="mt-10 space-y-3 ">
                 <div class="text-center space-x-2">
+                    <span class="text-lg font-semibold">K</span>
+                    <span> = </span>
+                    <input
+                        class="w-16 px-3 py-2 leading-tight text-center border border-blue-500 rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                        type="text"
+                        v-model="kNumberComputed"
+                    />
+                </div>
+
+                <div class="text-center space-x-2">
                     <button
                         class="shadow-md btn btn-primary"
                         @click="randomize"
@@ -80,7 +90,7 @@ export default defineComponent({
     },
 
     setup() {
-        // Initial objects
+        //---------------- Essentials ----------------
         const timelines = reactive({
             queens: gsap.timeline({
                 default: {
@@ -96,23 +106,36 @@ export default defineComponent({
             }),
         });
 
-        // Essentials
         const kNumber = ref<number>(4);
+        const kNumberComputed = computed({
+            get: () => kNumber.value + "",
+            set: (value) => {
+                kNumber.value = parseInt(value);
+            },
+        });
+
         const edgeLength = ref<number>(4);
 
-        // Initialize state
-        const initialState: interfaces.Position[] = [];
-        for (let i = 1; i <= kNumber.value; ++i) {
-            initialState.push({
-                x: i,
-                y: 1,
-            });
+        //---------------- Default's state ----------------
+        const defaultY = 1;
+        function generateDefaultState(k: number) {
+            const result: interfaces.Position[] = [];
+            for (let i = 1; i <= k; ++i) {
+                result.push({
+                    x: i,
+                    y: defaultY,
+                });
+            }
+
+            return result;
         }
-        const currentState = ref<interfaces.Position[]>(initialState);
+
+        //---------------- Solving's logics ----------------
+        const currentState = ref<interfaces.Position[]>(generateDefaultState(kNumber.value));
 
         const steps = ref<interfaces.Step[]>([]);
 
-        // Speed
+        //---------------- Animation's speed ----------------
         const baseDuration = 0.5;
         const speed = ref<number>(1);
         const speedComputed = computed({
@@ -124,13 +147,13 @@ export default defineComponent({
             },
         });
 
-        // Template references
+        //---------------- Template's references ----------------
         const queenRefs = ref<Element[]>([]);
         bus.$on("queenRefs", (refs: Element[]) => (queenRefs.value = refs));
 
         const moveRefs = ref<Element[]>([]);
 
-        // Helper functions
+        //---------------- Functionalities ----------------
         function resetMoves() {
             if (moveRefs.value.length !== 0) {
                 gsap.to(moveRefs.value, {
@@ -143,7 +166,6 @@ export default defineComponent({
             }
         }
 
-        // Game actions
         function randomize() {
             currentState.value = [];
 
@@ -152,7 +174,7 @@ export default defineComponent({
 
                 gsap.to(queenRefs.value[col - 1], {
                     // x: `${col * edgeLength.value}rem`,
-                    y: `${(row - initialState[0].y) * edgeLength.value}rem`,
+                    y: `${(row - defaultY) * edgeLength.value}rem`,
                     ease: "none",
                     duration: 0.5,
                     force3D: false,
@@ -168,7 +190,7 @@ export default defineComponent({
         }
 
         function reset() {
-            currentState.value = initialState;
+            currentState.value = generateDefaultState(kNumber.value);
 
             gsap.to(queenRefs.value, {
                 // x: 0,
@@ -200,20 +222,27 @@ export default defineComponent({
             }
         }
 
-        // Animate whenever getting a solution
+        //---------------- Watchers ----------------
+        // Reset 'currentState' whenever 'kNumber' change
+        watch(kNumber, (curr) => {
+            console.log("[watch] 'kNumber' changed...");
+            reset();
+        });
+
+        // Animate whenever solved a solution
         watch(steps, (curr) => {
-            console.log("[watch] 'steps' changed...", curr);
+            console.log("[watch] 'steps' changed...");
             curr.forEach((step) => {
                 timelines.queens.to(queenRefs.value[step.choice.x - 1], {
                     //x: `${step.choice.x * edgeLength.value}rem`,
-                    y: `${(step.choice.y - initialState[0].y) * edgeLength.value}rem`,
+                    y: `${(step.choice.y - defaultY) * edgeLength.value}rem`,
                     duration: baseDuration,
                 });
             });
         });
 
         watch(moveRefs, (curr) => {
-            console.log("[watch] 'moveRefs' changed...", curr);
+            console.log("[watch] 'moveRefs' changed...");
             curr.forEach((element) => {
                 timelines.moves.to(element, {
                     opacity: 1,
@@ -224,13 +253,14 @@ export default defineComponent({
 
         // Change animation's speed
         watch(speed, (curr) => {
-            console.log("[watch] 'speed' changed...", curr);
+            console.log("[watch] 'speed' changed...");
             timelines.queens.timeScale(curr);
             timelines.moves.timeScale(curr);
         });
 
         return {
             kNumber,
+            kNumberComputed,
             edgeLength,
             steps,
             speedComputed,

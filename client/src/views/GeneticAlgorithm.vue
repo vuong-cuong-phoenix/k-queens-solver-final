@@ -81,6 +81,16 @@
         <!-- Game actions -->
         <div class="mt-10 space-y-3">
             <div class="text-center space-x-2">
+                <span class="text-lg font-semibold">K</span>
+                <span> = </span>
+                <input
+                    class="w-16 px-3 py-2 leading-tight text-center border border-blue-500 rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                    type="text"
+                    v-model="kNumberComputed"
+                />
+            </div>
+
+            <div class="text-center space-x-2">
                 <button
                     class="shadow-md btn btn-success"
                     @click="solve"
@@ -129,7 +139,7 @@ export default defineComponent({
     },
 
     setup() {
-        // Essentials
+        //---------------- Essentials ----------------
         const timelines = reactive({
             boards: gsap.timeline({
                 default: {
@@ -149,20 +159,31 @@ export default defineComponent({
 
         const kNumber = ref<number>(4);
         const edgeLength = ref<number>(2);
+
         const crossOverPoint = ref<number>(Math.floor(kNumber.value / 2 - 1));
 
         // Core
         const generations = ref<interfaces.Individual[]>([]);
         // Initialize state
-        const initialState: interfaces.Position[] = [];
+        function generateDefaultState(k: number) {
+            const result: interfaces.Position[] = [];
+            for (let i = 1; i <= k; ++i) {
+                result.push({
+                    x: i,
+                    y: 1,
+                });
+            }
+            return result;
+        }
+        const initialState = ref<interfaces.Position[]>([]);
         for (let i = 1; i <= kNumber.value; ++i) {
-            initialState.push({
+            initialState.value.push({
                 x: i,
                 y: 1,
             });
         }
         const currentIndividual = ref<interfaces.Individual>({
-            state: initialState,
+            state: generateDefaultState(kNumber.value),
             fitnessValue: 0,
             parents: [],
         });
@@ -225,7 +246,7 @@ export default defineComponent({
                     duration: 0.5,
                     onComplete: () => {
                         currentIndividual.value = {
-                            state: initialState,
+                            state: generateDefaultState(kNumber.value),
                             fitnessValue: 0,
                             parents: [],
                         };
@@ -277,6 +298,21 @@ export default defineComponent({
             });
         });
 
+        const kNumberComputed = computed({
+            get: () => kNumber.value,
+            set: (value: any) => {
+                const kValue = parseInt(value);
+
+                currentIndividual.value = {
+                    state: generateDefaultState(kValue),
+                    fitnessValue: 0,
+                    parents: [],
+                };
+
+                kNumber.value = kValue;
+            },
+        });
+
         // Change animation's speed
         watch(speed, (curr) => {
             console.log("[watch] 'speed' changed...", curr);
@@ -297,6 +333,7 @@ export default defineComponent({
 
         return {
             kNumber,
+            kNumberComputed,
             edgeLength,
             speedComputed,
             currentIndividual,
