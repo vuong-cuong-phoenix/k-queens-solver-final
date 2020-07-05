@@ -93,7 +93,7 @@ def solve(nq):
         output.append(generation_output[-1])
         generation += 1
     # [print(x) for x in output]
-    print(json.dumps({"generation": output, "time": time.time() - start_time}, indent=4, sort_keys=True))
+    #  print(json.dumps({"generation": output, "time": time.time() - start_time}, indent=4, sort_keys=True))
     return output, time.time() - start_time
     # chrom_out = []
     # print("Solved in Generation {}!".format(generation - 1))

@@ -26,7 +26,7 @@ Vue.use(VueCompositionAPI);
 library.add(faBars, faCrown, faGithub, faHome, faInfoCircle, faChevronDown, faChevronUp, faRunning);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 
-axios.defaults.baseURL = "http://localhost:5000";
+axios.defaults.baseURL = "http://localhost:8000";
 
 Vue.config.productionTip = false;
 
