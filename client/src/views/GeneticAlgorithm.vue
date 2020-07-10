@@ -158,7 +158,7 @@ export default defineComponent({
         });
 
         const kNumber = ref<number>(4);
-        const edgeLength = ref<number>(2);
+        const edgeLength = ref<number>(2.5);
 
         const crossOverPoint = ref<number>(Math.floor(kNumber.value / 2 - 1));
 
@@ -263,7 +263,7 @@ export default defineComponent({
 
         // Animate whenever getting a solution
         watch(generations, (curr) => {
-            console.log("[watch] 'generations' changed...", curr);
+            console.log("[watch] 'generations' changed...");
             // Start animations
             if (curr.length === 0) {
                 return;
@@ -303,6 +303,37 @@ export default defineComponent({
             set: (value: any) => {
                 const kValue = parseInt(value);
 
+                switch (true) {
+                    case kValue <= 4: {
+                        edgeLength.value = 2.5;
+                        break;
+                    }
+                    case kValue > 4 && kValue <= 7: {
+                        edgeLength.value = 2;
+                        break;
+                    }
+                    case kValue > 7 && kValue <= 10: {
+                        edgeLength.value = 1.5;
+                        break;
+                    }
+                    case kValue > 10 && kValue <= 13: {
+                        edgeLength.value = 1.25;
+                        break;
+                    }
+                    case kValue > 13 && kValue <= 16: {
+                        edgeLength.value = 1;
+                        break;
+                    }
+                    case kValue > 16 && kValue <= 20: {
+                        edgeLength.value = 0.75;
+                        break;
+                    }
+                    default: {
+                        edgeLength.value = 0.5;
+                        break;
+                    }
+                }
+
                 currentIndividual.value = {
                     state: generateDefaultState(kValue),
                     fitnessValue: 0,
@@ -315,7 +346,7 @@ export default defineComponent({
 
         // Change animation's speed
         watch(speed, (curr) => {
-            console.log("[watch] 'speed' changed...", curr);
+            console.log("[watch] 'speed' changed...");
             timelines.boards.timeScale(curr);
             timelines.generateIcon.timeScale(curr);
         });

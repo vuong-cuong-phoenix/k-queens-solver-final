@@ -1,9 +1,10 @@
 <template>
     <div class="flex flex-wrap -mx-4">
         <div class="w-full px-4 md:w-8/12">
+            <!-- ref="boardContainerRef" -->
             <!-- Main Chess's board -->
             <ChessBoard
-                class="mx-auto mt-16 md:mt-24"
+                class="mx-auto mt-16 md:mt-20"
                 :showLegends="true"
                 :kNumber="kNumber"
                 :edgeLength="edgeLength"
@@ -70,7 +71,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch, reactive } from "@vue/composition-api";
+import {
+    defineComponent,
+    ref,
+    computed,
+    watch,
+    reactive,
+    onMounted,
+    watchEffect,
+    onBeforeUnmount,
+} from "@vue/composition-api";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/default.css";
 import gsap from "gsap";
@@ -148,6 +158,12 @@ export default defineComponent({
         });
 
         //---------------- Template's references ----------------
+        //        const boardContainerRef = ref<Element>(null as any);
+        //        const boardContainerWidth = ref<number>(0);
+        //        const refreshScrollArea: number = setInterval(() => {
+        //            boardContainerWidth.value = boardContainerRef.value.clientWidth;
+        //        }, 2000);
+
         const queenRefs = ref<Element[]>([]);
         bus.$on("queenRefs", (refs: Element[]) => (queenRefs.value = refs));
 
@@ -226,6 +242,38 @@ export default defineComponent({
         // Reset 'currentState' whenever 'kNumber' change
         watch(kNumber, (curr) => {
             console.log("[watch] 'kNumber' changed...");
+
+            switch (true) {
+                case curr <= 4: {
+                    edgeLength.value = 4;
+                    break;
+                }
+                case curr > 4 && curr <= 8: {
+                    edgeLength.value = 3.5;
+                    break;
+                }
+                case curr > 8 && curr <= 11: {
+                    edgeLength.value = 3;
+                    break;
+                }
+                case curr > 11 && curr <= 14: {
+                    edgeLength.value = 2.5;
+                    break;
+                }
+                case curr > 14 && curr <= 17: {
+                    edgeLength.value = 2;
+                    break;
+                }
+                case curr > 17 && curr <= 20: {
+                    edgeLength.value = 1.75;
+                    break;
+                }
+                default: {
+                    edgeLength.value = 1.25;
+                    break;
+                }
+            }
+
             reset();
         });
 
@@ -258,12 +306,19 @@ export default defineComponent({
             timelines.moves.timeScale(curr);
         });
 
+        //        watch(boardContainerWidth, (curr) => {});
+        //
+        //        onBeforeUnmount(() => {
+        //            clearInterval(refreshScrollArea);
+        //        });
+
         return {
             kNumber,
             kNumberComputed,
             edgeLength,
             steps,
             speedComputed,
+            //            boardContainerRef,
             moveRefs,
             randomize,
             reset,
