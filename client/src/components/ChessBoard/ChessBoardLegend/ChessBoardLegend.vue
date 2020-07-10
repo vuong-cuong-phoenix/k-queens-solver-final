@@ -14,6 +14,7 @@
             :style="{ 
                 width: edgeLength + 'rem',
                 height: edgeLength + 'rem',
+                fontSize: (edgeLength/2.5) + 'rem'
             }"
         >{{ i }}</div>
     </div>
