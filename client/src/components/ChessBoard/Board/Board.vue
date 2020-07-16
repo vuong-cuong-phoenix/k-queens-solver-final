@@ -11,7 +11,7 @@
             >
                 <div
                     class="flex items-center justify-center border border-gray-800"
-                    :class="(row + colInRow) % 2 == 0 ? 'bg-gray-100' : 'bg-blue-800'"
+                    :class="(row + colInRow) % 2 == 0 ? 'bg-gray-100' : 'bg-blue-900 bg-opacity-25'"
                     :style="{ 
                         width: edgeLength + 'rem',
                         height: edgeLength + 'rem',
