@@ -1,5 +1,8 @@
 <template>
-    <div class="flex items-center justify-center px-4 py-3 border-b border-blue-400 opacity-0">
+    <div
+        class="flex items-center py-3 border-b border-blue-400 opacity-0"
+        style="padding-left: calc(50% - 5rem);"
+    >
         <font-awesome-icon
             :icon="['fas', 'crown']"
             class="text-blue-700"
