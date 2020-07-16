@@ -7,7 +7,10 @@
                     <div
                         v-for="i in 2"
                         :key="i"
-                        class="w-6/12 p-4 md:w-full md:p-12"
+                        class="w-6/12 md:w-full chessboard-parent"
+                        :style="{
+                            padding: (edgeLength * 1.5) + 'rem',
+                        }"
                     >
                         <ChessBoard
                             ref="parentRefs"
@@ -79,27 +82,100 @@
         </div>
 
         <!-- Game actions -->
-        <div class="mt-10 space-y-3">
-            <div class="text-center space-x-2">
-                <span class="text-lg font-semibold">K</span>
-                <span> = </span>
-                <input
-                    class="w-16 px-3 py-2 leading-tight text-center border border-blue-500 rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                    type="text"
-                    v-model="kNumberComputed"
-                />
-            </div>
+        <div class="mt-10 space-y-4">
+            <div class="flex flex-col items-center justify-around space-y-4 md:flex-row md:space-y-0 game-actions__cores">
+                <!-- Input 'kNumber' -->
+                <div class="w-full text-center md:w-4/12 md:text-right space-x-2">
+                    <span class="text-lg font-semibold">K</span>
+                    <span> = </span>
+                    <div class="relative inline-block">
+                        <select
+                            v-model.number="kNumberComputed"
+                            class="block w-full px-4 py-2 pr-8 text-center bg-white border border-gray-700 rounded-lg appearance-none focus:outline-none"
+                        >
+                            <option
+                                v-for="k in kNumberList"
+                                :key="k"
+                            >{{ k }}</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                            <svg
+                                class="w-4 h-4 fill-current"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                            >
+                                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="text-center space-x-2">
-                <button
-                    class="shadow-md btn btn-success"
-                    @click="solve"
-                >Solve</button>
+                <div class="w-1/12">
+                    <svg
+                        class="w-8 h-auto mx-auto md:w-1/2 processing-icon"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            clip-rule="evenodd"
+                            d="M32 16.009c0-.267-.11-.522-.293-.714l-9.899-9.999c-.391-.395-1.024-.394-1.414 0-.391.394-.391 1.034 0 1.428l8.193 8.275H1c-.552 0-1 .452-1 1.01s.448 1.01 1 1.01h27.586l-8.192 8.275c-.391.394-.39 1.034 0 1.428.391.394 1.024.394 1.414 0l9.899-9.999c.187-.189.29-.449.293-.714z"
+                            fill="#121313"
+                            fill-rule="evenodd"
+                        />
+                    </svg>
+                </div>
 
-                <button
-                    class="shadow-md btn btn-primary"
-                    @click="reset"
-                >Reset</button>
+                <!-- Game actions -->
+                <div class="flex items-center justify-center w-full text-center space-x-4 md:w-2/12 md:flex-col md:space-x-0 md:space-y-2 lg:flex-row lg:space-x-4 lg:space-y-0">
+                    <button
+                        class="shadow-md btn btn-primary"
+                        @click="reset"
+                        :disabled="!isSolved || isRunning"
+                    >Reset</button>
+
+                    <button
+                        class="shadow-md btn btn-success"
+                        @click="solve"
+                        :disabled="isSolving"
+                    >Solve</button>
+                </div>
+
+                <div class="w-1/12">
+                    <svg
+                        class="w-8 h-auto mx-auto md:w-1/2 processing-icon"
+                        viewBox="0 0 32 32"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            clip-rule="evenodd"
+                            d="M32 16.009c0-.267-.11-.522-.293-.714l-9.899-9.999c-.391-.395-1.024-.394-1.414 0-.391.394-.391 1.034 0 1.428l8.193 8.275H1c-.552 0-1 .452-1 1.01s.448 1.01 1 1.01h27.586l-8.192 8.275c-.391.394-.39 1.034 0 1.428.391.394 1.024.394 1.414 0l9.899-9.999c.187-.189.29-.449.293-.714z"
+                            fill="#121313"
+                            fill-rule="evenodd"
+                        />
+                    </svg>
+                </div>
+
+                <div class="flex items-center justify-center w-full md:w-4/12 md:justify-start">
+                    <Spinner v-if="isSolving && !isSolved"></Spinner>
+
+                    <div v-if="!isSolving && isSolved && !solveError.checked">
+                        <div>
+                            <span class="text-lg font-semibold">Solved in:</span>
+                            <span class="ml-2 font-semibold text-blue-700">{{ solvedTime }}</span>
+                            <span class="ml-1 italic">seconds</span>
+                        </div>
+                        <div
+                            ref="countGenerationRef"
+                            class="text-lg font-semibold text-center opacity-0"
+                        >
+                            <span class="">Generation</span>
+                            <span class="ml-1 text-blue-700">#{{ countGeneration }}</span>
+                        </div>
+                    </div>
+
+                    <div v-if="solveError.checked && !isSolving">
+                        <span class="text-lg font-semibold text-red-600">{{ solveError.message }}</span>
+                    </div>
+                </div>
             </div>
 
             <div class="flex items-center w-full pb-4 mx-auto sm:w-8/12 xl:w-6/12 space-x-4">
@@ -107,7 +183,7 @@
                 <VueSlider
                     class="flex-grow"
                     v-model="speedComputed"
-                    :data="['0.25x', '0.5x', '1x', '2x', '3x', '4x']"
+                    :data="['0.25x', '0.5x', '1x', '2x', '3x', '4x', '∞']"
                     :marks="true"
                     :absorb="true"
                     :lazy="true"
@@ -123,12 +199,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted, computed, watch } from "@vue/composition-api";
+import { defineComponent, ref, reactive, onMounted, computed, watch, onBeforeUpdate } from "@vue/composition-api";
 import gsap from "gsap";
 import axios, { AxiosResponse } from "axios";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/default.css";
 import ChessBoard from "@/components/ChessBoard/ChessBoard.vue";
+import Spinner from "@/components/UI/Spinner/Spinner.vue";
 import * as interfaces from "@/interfaces/interfaces";
 
 export default defineComponent({
@@ -136,6 +213,7 @@ export default defineComponent({
     components: {
         VueSlider,
         ChessBoard,
+        Spinner,
     },
 
     setup() {
@@ -158,9 +236,21 @@ export default defineComponent({
         });
 
         const kNumber = ref<number>(4);
+        const kNumberList: number[] = [];
+        for (let i = 4; i <= 20; ++i) {
+            kNumberList.push(i);
+        }
+
         const edgeLength = ref<number>(2.5);
 
         const crossOverPoint = ref<number>(Math.floor(kNumber.value / 2 - 1));
+
+        const isSolving = ref<boolean>(false);
+        const isSolved = ref<boolean>(false);
+        const isRunning = ref<boolean>(false);
+        const solveError = ref<{ checked: boolean; message: string }>({ checked: false, message: "" });
+        const solvedTime = ref<number>(0);
+        const countGeneration = ref<number>(-1);
 
         // Core
         const generations = ref<interfaces.Individual[]>([]);
@@ -203,38 +293,37 @@ export default defineComponent({
         // Speed
         const baseDuration = 1;
         const speed = ref<number>(1);
+        const speedMaxValue = 200;
         const speedComputed = computed({
             get: () => {
-                return speed.value + "x";
+                if (speed.value === speedMaxValue) {
+                    return "∞";
+                } else {
+                    return speed.value + "x";
+                }
             },
             set: (value) => {
-                speed.value = parseFloat(value);
+                if (value === "∞") {
+                    speed.value = speedMaxValue;
+                } else {
+                    speed.value = parseFloat(value);
+                }
             },
         });
 
         // Template references
         const parentRefs = ref<Vue[]>([]);
         const individualRef = ref<Vue>();
-
-        async function solve() {
-            const postData: interfaces.GeneticAlgorithmPostRequest = {
-                k: kNumber.value,
-            };
-
-            try {
-                const response: AxiosResponse<interfaces.GeneticAlgorithmPostResponse> = await axios.post(
-                    "/genetic-algorithm",
-                    postData
-                );
-
-                generations.value = response.data.generations;
-            } catch (err) {
-                console.error(err);
-            }
-        }
+        const countGenerationRef = ref<Element>();
 
         function reset() {
             if (generations.value.length !== 0) {
+                isSolved.value = false;
+                solveError.value = {
+                    checked: false,
+                    message: "",
+                };
+
                 const resetTimeline = gsap.timeline({
                     defaults: {
                         force3D: false,
@@ -261,29 +350,79 @@ export default defineComponent({
             }
         }
 
+        async function solve() {
+            console.log("[method] Solving...");
+
+            isSolving.value = true;
+            isSolved.value = false;
+            solveError.value = {
+                checked: false,
+                message: "",
+            };
+
+            const postData: interfaces.GeneticAlgorithmPostRequest = {
+                k: kNumber.value,
+            };
+
+            try {
+                const response: AxiosResponse<interfaces.GeneticAlgorithmPostResponse> = await axios.post(
+                    "/genetic-algorithm",
+                    postData
+                );
+
+                solvedTime.value = +response.data.time.toFixed(4);
+                generations.value = response.data.generations;
+
+                isSolving.value = false;
+                isSolved.value = true;
+            } catch (err) {
+                console.error(err);
+
+                isSolving.value = false;
+                isSolved.value = true;
+                solveError.value = {
+                    checked: true,
+                    message: err,
+                };
+            }
+        }
+
         // Animate whenever getting a solution
         watch(generations, (curr) => {
             console.log("[watch] 'generations' changed...");
-            // Start animations
             if (curr.length === 0) {
                 return;
             }
 
+            isRunning.value = true;
+
+            countGeneration.value = -1;
+
+            // Start animations
             timelines.generateIcon.play();
 
             curr.forEach((gen) => {
                 // Hide all first
-                timelines.boards.to([parentRefs.value[0].$el, parentRefs.value[1].$el, individualRef.value!.$el], {
-                    opacity: 0,
-                    duration: 0.5,
-                    onComplete: () => {
-                        currentIndividual.value = gen;
-                    },
-                });
+                timelines.boards.to(
+                    [
+                        parentRefs.value[0].$el,
+                        parentRefs.value[1].$el,
+                        individualRef.value!.$el,
+                        countGenerationRef.value!,
+                    ],
+                    {
+                        opacity: 0,
+                        duration: 0.5,
+                        onComplete: () => {
+                            currentIndividual.value = gen;
+                            countGeneration.value++;
+                        },
+                    }
+                );
                 // Dummy animation to delay before animate Parents
                 timelines.boards.to(individualRef.value!.$el, { duration: 0.25 });
                 // Then animate Parents
-                timelines.boards.to([parentRefs.value[0].$el, parentRefs.value[1].$el], {
+                timelines.boards.to([parentRefs.value[0].$el, parentRefs.value[1].$el, countGenerationRef.value!], {
                     opacity: 1,
                     duration: baseDuration,
                 });
@@ -295,36 +434,41 @@ export default defineComponent({
 
             timelines.boards.eventCallback("onComplete", () => {
                 timelines.generateIcon.paused(true);
+                isRunning.value = false;
             });
         });
 
         const kNumberComputed = computed({
             get: () => kNumber.value,
-            set: (value: any) => {
-                const kValue = parseInt(value);
+            set: (value: number) => {
+                currentIndividual.value = {
+                    state: generateDefaultState(value),
+                    fitnessValue: 0,
+                    parents: [],
+                };
 
                 switch (true) {
-                    case kValue <= 4: {
+                    case value <= 4: {
                         edgeLength.value = 2.5;
                         break;
                     }
-                    case kValue > 4 && kValue <= 7: {
+                    case value > 4 && value <= 7: {
                         edgeLength.value = 2;
                         break;
                     }
-                    case kValue > 7 && kValue <= 10: {
+                    case value > 7 && value <= 10: {
                         edgeLength.value = 1.5;
                         break;
                     }
-                    case kValue > 10 && kValue <= 13: {
+                    case value > 10 && value <= 13: {
                         edgeLength.value = 1.25;
                         break;
                     }
-                    case kValue > 13 && kValue <= 16: {
+                    case value > 13 && value <= 16: {
                         edgeLength.value = 1;
                         break;
                     }
-                    case kValue > 16 && kValue <= 20: {
+                    case value > 16 && value <= 20: {
                         edgeLength.value = 0.75;
                         break;
                     }
@@ -334,13 +478,7 @@ export default defineComponent({
                     }
                 }
 
-                currentIndividual.value = {
-                    state: generateDefaultState(kValue),
-                    fitnessValue: 0,
-                    parents: [],
-                };
-
-                kNumber.value = kValue;
+                kNumber.value = value;
             },
         });
 
@@ -364,13 +502,21 @@ export default defineComponent({
 
         return {
             kNumber,
+            kNumberList,
             kNumberComputed,
             edgeLength,
+            isSolving,
+            isSolved,
+            isRunning,
+            solveError,
+            solvedTime,
+            countGeneration,
             speedComputed,
             currentIndividual,
             parentsComputed,
             parentRefs,
             individualRef,
+            countGenerationRef,
             solve,
             reset,
         };
@@ -379,12 +525,24 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.generate-icon {
+.game-actions__cores {
+    min-height: 3.5rem;
+}
+
+.generate-icon,
+.processing-icon {
     transform: rotate(90deg);
 }
 
+@media only screen and (max-width: 768px) {
+    .chessboard-parent {
+        padding: 1rem !important;
+    }
+}
+
 @media only screen and (min-width: 768px) {
-    .generate-icon {
+    .generate-icon,
+    .processing-icon {
         transform: rotate(0);
     }
 }

@@ -4,41 +4,123 @@
             <!-- ref="boardContainerRef" -->
             <!-- Main Chess's board -->
             <ChessBoard
-                class="mx-auto mt-16 md:mt-20"
+                class="mx-auto"
+                :style="{
+                    marginTop: (edgeLength * 1.5) + 'rem',
+                }"
                 :showLegends="true"
                 :kNumber="kNumber"
                 :edgeLength="edgeLength"
             />
 
-            <!-- Game actions -->
             <div class="mt-10 space-y-3 ">
-                <div class="text-center space-x-2">
-                    <span class="text-lg font-semibold">K</span>
-                    <span> = </span>
-                    <input
-                        class="w-16 px-3 py-2 leading-tight text-center border border-blue-500 rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-                        type="text"
-                        v-model="kNumberComputed"
-                    />
-                </div>
+                <div class="flex flex-col items-center justify-around space-y-4 md:flex-row md:space-y-0">
+                    <!-- Input 'kNumber' -->
+                    <div class="w-full text-center space-x-2 md:w-4/12 md:text-right">
+                        <span class="text-lg font-semibold">K</span>
+                        <span> = </span>
+                        <div class="relative inline-block">
+                            <select
+                                v-model.number="kNumber"
+                                class="block w-full px-4 py-2 pr-8 text-center bg-white border border-gray-700 rounded-lg appearance-none focus:outline-none"
+                            >
+                                <option
+                                    v-for="k in kNumberList"
+                                    :key="k"
+                                >{{ k }}</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <svg
+                                    class="w-4 h-4 fill-current"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                >
+                                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="text-center space-x-2">
-                    <button
-                        class="shadow-md btn btn-primary"
-                        @click="randomize"
-                    >Randomize</button>
+                    <div class="w-full md:w-1/12">
+                        <svg
+                            class="w-8 h-auto mx-auto md:w-1/2 processing-icon"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                clip-rule="evenodd"
+                                d="M32 16.009c0-.267-.11-.522-.293-.714l-9.899-9.999c-.391-.395-1.024-.394-1.414 0-.391.394-.391 1.034 0 1.428l8.193 8.275H1c-.552 0-1 .452-1 1.01s.448 1.01 1 1.01h27.586l-8.192 8.275c-.391.394-.39 1.034 0 1.428.391.394 1.024.394 1.414 0l9.899-9.999c.187-.189.29-.449.293-.714z"
+                                fill="#121313"
+                                fill-rule="evenodd"
+                            />
+                        </svg>
+                    </div>
 
-                    <button
-                        class="shadow-md btn btn-primary"
-                        @click="reset"
-                    >Reset</button>
-                </div>
+                    <!-- Game actions -->
+                    <div class="w-full md:w-3/12 space-y-2">
+                        <div class="flex items-center justify-center text-center space-x-2 md:flex-col md:space-x-0 md:space-y-2 lg:flex-row lg:space-x-2 lg:space-y-0">
+                            <button
+                                class="shadow-md btn btn-primary"
+                                @click="randomize"
+                                :disabled="isSolving || isRunning"
+                            >Randomize</button>
 
-                <div class="text-center space-x-2">
-                    <button
-                        class="shadow-md btn btn-success"
-                        @click="solve"
-                    >Solve</button>
+                            <button
+                                class="shadow-md btn btn-primary"
+                                @click="reset"
+                                :disabled="!isSolved || isRunning"
+                            >Reset</button>
+                        </div>
+
+                        <div class="text-center space-x-2">
+                            <button
+                                class="shadow-md btn btn-success"
+                                @click="solve"
+                                :disabled="isSolving"
+                            >Solve</button>
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-1/12">
+                        <svg
+                            class="w-8 h-auto mx-auto md:w-1/2 processing-icon"
+                            viewBox="0 0 32 32"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                clip-rule="evenodd"
+                                d="M32 16.009c0-.267-.11-.522-.293-.714l-9.899-9.999c-.391-.395-1.024-.394-1.414 0-.391.394-.391 1.034 0 1.428l8.193 8.275H1c-.552 0-1 .452-1 1.01s.448 1.01 1 1.01h27.586l-8.192 8.275c-.391.394-.39 1.034 0 1.428.391.394 1.024.394 1.414 0l9.899-9.999c.187-.189.29-.449.293-.714z"
+                                fill="#121313"
+                                fill-rule="evenodd"
+                            />
+                        </svg>
+                    </div>
+
+                    <div class="flex items-center justify-center w-full md:w-4/12 md:justify-start">
+                        <div class="flex items-center justify-center w-full md:w-4/12 md:justify-start">
+                            <Spinner v-if="isSolving && !isSolved"></Spinner>
+
+                            <div
+                                v-if="!isSolving && isSolved && !solveError.checked"
+                                class="text-center"
+                            >
+                                <div class="flex md:flex-col">
+                                    <span class="text-lg font-semibold">Solved in:</span>
+                                    <span>
+                                        <span class="ml-2 font-semibold text-blue-700">{{ solvedTime }}</span>
+                                        <span class="ml-1 italic">seconds</span>
+                                    </span>
+                                </div>
+                                <div class="text-lg font-semibold">
+                                    <span class="text-blue-700">{{ steps.length }}</span>
+                                    <span class="ml-1">moves</span>
+                                </div>
+                            </div>
+
+                            <div v-if="solveError.checked && !isSolving">
+                                <span class="text-lg font-semibold text-red-600">{{ solveError.message }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex items-center w-full pb-4 mx-auto sm:w-8/12 xl:w-6/12 space-x-4">
@@ -46,7 +128,7 @@
                     <VueSlider
                         class="flex-grow"
                         v-model="speedComputed"
-                        :data="['0.25x', '0.5x', '1x', '2x', '3x', '4x']"
+                        :data="['0.25x', '0.5x', '1x', '2x', '3x', '4x', '∞']"
                         :marks="true"
                         :absorb="true"
                         :lazy="true"
@@ -89,6 +171,7 @@ import { bus } from "@/main";
 import * as interfaces from "@/interfaces/interfaces";
 import ChessBoard from "@/components/ChessBoard/ChessBoard.vue";
 import ListMoves from "@/components/ListMoves/ListMoves.vue";
+import Spinner from "@/components/UI/Spinner/Spinner.vue";
 
 export default defineComponent({
     name: "MinConflict",
@@ -97,6 +180,7 @@ export default defineComponent({
         VueSlider,
         ChessBoard,
         ListMoves,
+        Spinner,
     },
 
     setup() {
@@ -117,14 +201,18 @@ export default defineComponent({
         });
 
         const kNumber = ref<number>(4);
-        const kNumberComputed = computed({
-            get: () => kNumber.value + "",
-            set: (value) => {
-                kNumber.value = parseInt(value);
-            },
-        });
+        const kNumberList: number[] = [];
+        for (let i = 4; i <= 20; ++i) {
+            kNumberList.push(i);
+        }
 
         const edgeLength = ref<number>(4);
+
+        const isSolving = ref<boolean>(false);
+        const isSolved = ref<boolean>(false);
+        const isRunning = ref<boolean>(false);
+        const solveError = ref<{ checked: boolean; message: string }>({ checked: false, message: "" });
+        const solvedTime = ref<number>(0);
 
         //---------------- Default's state ----------------
         const defaultY = 1;
@@ -148,22 +236,25 @@ export default defineComponent({
         //---------------- Animation's speed ----------------
         const baseDuration = 0.5;
         const speed = ref<number>(1);
+        const speedMaxValue = 50;
         const speedComputed = computed({
             get: () => {
-                return speed.value + "x";
+                if (speed.value === speedMaxValue) {
+                    return "∞";
+                } else {
+                    return speed.value + "x";
+                }
             },
             set: (value) => {
-                speed.value = parseFloat(value);
+                if (value === "∞") {
+                    speed.value = speedMaxValue;
+                } else {
+                    speed.value = parseFloat(value);
+                }
             },
         });
 
         //---------------- Template's references ----------------
-        //        const boardContainerRef = ref<Element>(null as any);
-        //        const boardContainerWidth = ref<number>(0);
-        //        const refreshScrollArea: number = setInterval(() => {
-        //            boardContainerWidth.value = boardContainerRef.value.clientWidth;
-        //        }, 2000);
-
         const queenRefs = ref<Element[]>([]);
         bus.$on("queenRefs", (refs: Element[]) => (queenRefs.value = refs));
 
@@ -183,8 +274,14 @@ export default defineComponent({
         }
 
         function randomize() {
-            currentState.value = [];
+            isSolved.value = false;
+            isRunning.value = true;
+            solveError.value = {
+                checked: false,
+                message: "",
+            };
 
+            currentState.value = [];
             for (let col = 1; col <= kNumber.value; ++col) {
                 const row = Math.floor(Math.random() * (kNumber.value - 1)) + 1;
 
@@ -194,6 +291,9 @@ export default defineComponent({
                     ease: "none",
                     duration: 0.5,
                     force3D: false,
+                    onComplete: () => {
+                        isRunning.value = false;
+                    },
                 });
 
                 currentState.value.push({
@@ -206,7 +306,12 @@ export default defineComponent({
         }
 
         function reset() {
-            currentState.value = generateDefaultState(kNumber.value);
+            isSolved.value = false;
+            isRunning.value = true;
+            solveError.value = {
+                checked: false,
+                message: "",
+            };
 
             gsap.to(queenRefs.value, {
                 // x: 0,
@@ -214,6 +319,10 @@ export default defineComponent({
                 ease: "none",
                 duration: 0.25,
                 force3D: false,
+                onComplete: () => {
+                    currentState.value = generateDefaultState(kNumber.value);
+                    isRunning.value = false;
+                },
             });
 
             resetMoves();
@@ -226,15 +335,33 @@ export default defineComponent({
                 iteration: 1000 * kNumber.value,
             };
 
+            isSolving.value = true;
+            isSolved.value = false;
+            solveError.value = {
+                checked: false,
+                message: "",
+            };
+
             try {
                 const response: AxiosResponse<interfaces.MinConflictPostResponse> = await axios.post(
                     "/min-conflict",
                     postData
                 );
 
+                solvedTime.value = +response.data.time.toFixed(4);
                 steps.value = response.data.steps;
+
+                isSolving.value = false;
+                isSolved.value = true;
             } catch (err) {
                 console.error(err);
+
+                isSolving.value = false;
+                isSolved.value = true;
+                solveError.value = {
+                    checked: true,
+                    message: err,
+                };
             }
         }
 
@@ -280,12 +407,32 @@ export default defineComponent({
         // Animate whenever solved a solution
         watch(steps, (curr) => {
             console.log("[watch] 'steps' changed...");
+            if (curr.length === 0) {
+                return;
+            }
+
+            isRunning.value = true;
+
             curr.forEach((step) => {
+                timelines.queens.to(queenRefs.value[step.choice.x - 1], {
+                    duration: 0,
+                    color: "#2b6cb0",
+                });
                 timelines.queens.to(queenRefs.value[step.choice.x - 1], {
                     //x: `${step.choice.x * edgeLength.value}rem`,
                     y: `${(step.choice.y - defaultY) * edgeLength.value}rem`,
                     duration: baseDuration,
                 });
+                timelines.queens.to(queenRefs.value[step.choice.x - 1], {
+                    //x: `${step.choice.x * edgeLength.value}rem`,
+                    //duration: baseDuration,
+                    duration: 0,
+                    color: "black",
+                });
+            });
+
+            timelines.queens.eventCallback("onComplete", () => {
+                isRunning.value = false;
             });
         });
 
@@ -306,19 +453,17 @@ export default defineComponent({
             timelines.moves.timeScale(curr);
         });
 
-        //        watch(boardContainerWidth, (curr) => {});
-        //
-        //        onBeforeUnmount(() => {
-        //            clearInterval(refreshScrollArea);
-        //        });
-
         return {
             kNumber,
-            kNumberComputed,
+            kNumberList,
             edgeLength,
+            isSolving,
+            isSolved,
+            isRunning,
+            solveError,
+            solvedTime,
             steps,
             speedComputed,
-            //            boardContainerRef,
             moveRefs,
             randomize,
             reset,
@@ -327,3 +472,15 @@ export default defineComponent({
     },
 });
 </script>
+
+<style scoped>
+.processing-icon {
+    transform: rotate(90deg);
+}
+
+@media only screen and (min-width: 768px) {
+    .processing-icon {
+        transform: rotate(0);
+    }
+}
+</style>
