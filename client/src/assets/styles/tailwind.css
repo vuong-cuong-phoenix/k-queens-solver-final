@@ -9,6 +9,9 @@
 .btn:focus {
     @apply outline-none;
 }
+.btn:disabled {
+    @apply cursor-not-allowed;
+}
 
 .btn-primary {
     @apply text-white bg-blue-600;
@@ -16,12 +19,18 @@
 .btn-primary:hover {
     @apply bg-blue-700;
 }
+.btn-primary:disabled {
+    @apply opacity-50;
+}
 
 .btn-success {
     @apply text-white bg-green-600;
 }
 .btn-success:hover {
     @apply bg-green-700;
+}
+.btn-success:disabled {
+    @apply opacity-50;
 }
 
 @tailwind utilities;
