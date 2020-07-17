@@ -9,6 +9,8 @@ mypy = "*"
 [packages]
 flask = "*"
 flask-cors = "*"
+gunicorn = "*"
+eventlet = "*"
 
 [requires]
 python_version = "3.7"
