@@ -21,11 +21,22 @@ import "./registerServiceWorker";
 import router from "./router";
 import store from "./store";
 
+import Spinner from "./components/UI/Spinner/Spinner.vue";
+import ArrowIcon from "./components/UI/Icons/ArrowIcon.vue";
+import GenerateIcon from "./components/UI/Icons/GenerateIcon.vue";
+
+// Libraries
 Vue.use(VueCompositionAPI);
 
 library.add(faBars, faCrown, faGithub, faHome, faInfoCircle, faChevronDown, faChevronUp, faRunning);
 Vue.component("font-awesome-icon", FontAwesomeIcon);
 
+// Custom components
+Vue.component("Spinner", Spinner);
+Vue.component("ArrowIcon", ArrowIcon);
+Vue.component("GenerateIcon", GenerateIcon);
+
+// Defaults
 axios.defaults.baseURL = "http://localhost:8000";
 
 Vue.config.productionTip = false;
