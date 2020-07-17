@@ -1,6 +1,6 @@
 <template>
     <div
-        class="mt-8 overflow-auto border border-blue-500 rounded-lg shadow-lg"
+        class="mt-8 overflow-y-scroll border border-blue-500 rounded-lg shadow-lg "
         style="height: calc(100vh - 4rem - 1rem - 2rem - 1rem)"
     >
         <div class="px-4 py-3 text-xl font-bold text-center uppercase border-b border-blue-400">List Moves</div>
