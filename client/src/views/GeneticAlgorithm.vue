@@ -199,7 +199,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, onMounted, computed, watch, onBeforeUpdate } from "@vue/composition-api";
+import {
+    defineComponent,
+    ref,
+    reactive,
+    onMounted,
+    computed,
+    watch,
+    onBeforeUpdate,
+    onBeforeUnmount,
+} from "@vue/composition-api";
 import gsap from "gsap";
 import axios, { AxiosResponse } from "axios";
 import VueSlider from "vue-slider-component";
@@ -498,6 +507,11 @@ export default defineComponent({
                 stopColor: "#ff80b3",
             });
             timelines.generateIcon.paused(true);
+        });
+
+        onBeforeUnmount(() => {
+            timelines.boards.kill();
+            timelines.generateIcon.kill();
         });
 
         return {
