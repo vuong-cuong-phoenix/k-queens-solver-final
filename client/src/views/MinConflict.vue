@@ -41,18 +41,7 @@
                     </div>
 
                     <div class="w-full md:w-1/12">
-                        <svg
-                            class="w-8 h-auto mx-auto md:w-1/2 processing-icon"
-                            viewBox="0 0 32 32"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                clip-rule="evenodd"
-                                d="M32 16.009c0-.267-.11-.522-.293-.714l-9.899-9.999c-.391-.395-1.024-.394-1.414 0-.391.394-.391 1.034 0 1.428l8.193 8.275H1c-.552 0-1 .452-1 1.01s.448 1.01 1 1.01h27.586l-8.192 8.275c-.391.394-.39 1.034 0 1.428.391.394 1.024.394 1.414 0l9.899-9.999c.187-.189.29-.449.293-.714z"
-                                fill="#121313"
-                                fill-rule="evenodd"
-                            />
-                        </svg>
+                        <ArrowIcon class="w-8 h-auto mx-auto md:w-1/2 processing-icon" />
                     </div>
 
                     <!-- Game actions -->
@@ -81,18 +70,7 @@
                     </div>
 
                     <div class="w-full md:w-1/12">
-                        <svg
-                            class="w-8 h-auto mx-auto md:w-1/2 processing-icon"
-                            viewBox="0 0 32 32"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                clip-rule="evenodd"
-                                d="M32 16.009c0-.267-.11-.522-.293-.714l-9.899-9.999c-.391-.395-1.024-.394-1.414 0-.391.394-.391 1.034 0 1.428l8.193 8.275H1c-.552 0-1 .452-1 1.01s.448 1.01 1 1.01h27.586l-8.192 8.275c-.391.394-.39 1.034 0 1.428.391.394 1.024.394 1.414 0l9.899-9.999c.187-.189.29-.449.293-.714z"
-                                fill="#121313"
-                                fill-rule="evenodd"
-                            />
-                        </svg>
+                        <ArrowIcon class="w-8 h-auto mx-auto md:w-1/2 processing-icon" />
                     </div>
 
                     <div class="flex items-center justify-center w-full md:w-4/12 md:justify-start">
@@ -172,7 +150,6 @@ import { bus } from "@/main";
 import * as interfaces from "@/interfaces/interfaces";
 import ChessBoard from "@/components/ChessBoard/ChessBoard.vue";
 import ListMoves from "@/components/ListMoves/ListMoves.vue";
-import Spinner from "@/components/UI/Spinner/Spinner.vue";
 
 export default defineComponent({
     name: "MinConflict",
@@ -181,7 +158,6 @@ export default defineComponent({
         VueSlider,
         ChessBoard,
         ListMoves,
-        Spinner,
     },
 
     setup() {
