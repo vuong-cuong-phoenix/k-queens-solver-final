@@ -83,13 +83,13 @@
                     <button
                         class="shadow-md btn btn-primary"
                         @click="reset"
-                        :disabled="!isSolved || isRunning"
+                        :disabled="!status.isSolved || status.isRunning"
                     >Reset</button>
 
                     <button
                         class="shadow-md btn btn-success"
                         @click="solve"
-                        :disabled="isSolving"
+                        :disabled="status.isSolving"
                     >Solve</button>
                 </div>
                 <!-- END Game action's buttons -->
@@ -100,12 +100,12 @@
 
                 <!-- Results -->
                 <div class="flex items-center justify-center w-full md:w-4/12 md:justify-start">
-                    <Spinner v-if="isSolving && !isSolved"></Spinner>
+                    <Spinner v-if="status.isSolving && !status.isSolved"></Spinner>
 
-                    <div v-if="!isSolving && isSolved && !solveError.checked">
+                    <div v-if="!status.isSolving && status.isSolved && (result.error === '')">
                         <div>
                             <span class="text-lg font-semibold">Solved in:</span>
-                            <span class="ml-2 font-semibold text-blue-700">{{ solvedTime }}</span>
+                            <span class="ml-2 font-semibold text-blue-700">{{ result.time }}</span>
                             <span class="ml-1 italic">seconds</span>
                         </div>
                         <div
@@ -113,12 +113,12 @@
                             class="text-lg font-semibold text-center opacity-0"
                         >
                             <span class="">Generation</span>
-                            <span class="ml-1 text-blue-700">#{{ countGeneration }}</span>
+                            <span class="ml-1 text-blue-700">#{{ status.countGeneration }}</span>
                         </div>
                     </div>
 
-                    <div v-if="solveError.checked && !isSolving">
-                        <span class="text-lg font-semibold text-red-600">{{ solveError.message }}</span>
+                    <div v-if="(result.error !== '') && !status.isSolving">
+                        <span class="text-lg font-semibold text-red-600">{{ result.error }}</span>
                     </div>
                 </div>
                 <!-- END Results -->
@@ -215,15 +215,30 @@ export default defineComponent({
         const edgeLength = ref<number>(2.5);
         const crossOverPoint = ref<number>(Math.floor(kNumber.value / 2 - 1));
 
-        const isSolving = ref<boolean>(false);
-        const isSolved = ref<boolean>(false);
-        const isRunning = ref<boolean>(false);
-        const solveError = ref<{ checked: boolean; message: string }>({ checked: false, message: "" });
-        const solvedTime = ref<number>(0);
-        const countGeneration = ref<number>(-1);
+        // UI/UX
+        const status = reactive<{
+            isSolving: boolean;
+            isSolved: boolean;
+            isRunning: boolean;
+            countGeneration: number;
+        }>({
+            isSolving: false,
+            isSolved: false,
+            isRunning: false,
+            countGeneration: -1,
+        });
 
-        // Cores
-        const generations = ref<interfaces.Individual[]>([]);
+        // Solving Result
+        const result = reactive<{
+            generations: interfaces.Individual[];
+            time: number;
+            error: string;
+        }>({
+            generations: [],
+            time: 0,
+            error: "",
+        });
+
         const currentIndividual = ref<interfaces.Individual>({
             state: generateDefaultState(kNumber.value),
             fitnessValue: 0,
@@ -245,13 +260,12 @@ export default defineComponent({
         const kNumberComputed = computed({
             get: () => kNumber.value,
             set: (value: number) => {
-                isSolved.value = false;
-                solveError.value = {
-                    checked: false,
-                    message: "",
-                };
+                status.isSolved = false;
+                result.error = "";
 
-                generations.value = [];
+                if (result.generations.length !== 0) {
+                    result.generations = [];
+                }
                 currentIndividual.value = {
                     state: generateDefaultState(value),
                     fitnessValue: 0,
@@ -336,7 +350,7 @@ export default defineComponent({
                         fitnessValue: 0,
                         parents: [],
                     };
-                    generations.value = [];
+                    result.generations = [];
                 },
             });
 
@@ -350,7 +364,7 @@ export default defineComponent({
         }
 
         function animateGenerationsAfterSolved(gens: interfaces.Individual[]) {
-            countGeneration.value = -1;
+            status.countGeneration = -1;
 
             // Start animations
             timelines.generateIcon.play();
@@ -369,7 +383,7 @@ export default defineComponent({
                         duration: 0.5,
                         onComplete: () => {
                             currentIndividual.value = gen;
-                            countGeneration.value++;
+                            status.countGeneration++;
                         },
                     }
                 );
@@ -388,7 +402,7 @@ export default defineComponent({
 
             timelines.boards.eventCallback("onComplete", () => {
                 timelines.generateIcon.paused(true);
-                isRunning.value = false;
+                status.isRunning = false;
             });
         }
 
@@ -396,13 +410,10 @@ export default defineComponent({
         function reset() {
             console.log("[method] Reseting...");
 
-            isSolved.value = false;
-            solveError.value = {
-                checked: false,
-                message: "",
-            };
+            status.isSolved = false;
+            result.error = "";
 
-            if (generations.value.length !== 0) {
+            if (result.generations.length !== 0) {
                 animateResetting();
             }
         }
@@ -410,12 +421,9 @@ export default defineComponent({
         async function solve() {
             console.log("[method] Solving...");
 
-            isSolving.value = true;
-            isSolved.value = false;
-            solveError.value = {
-                checked: false,
-                message: "",
-            };
+            status.isSolving = true;
+            status.isSolved = false;
+            result.error = "";
 
             const postData: interfaces.GeneticAlgorithmPostRequest = {
                 k: kNumber.value,
@@ -426,36 +434,38 @@ export default defineComponent({
                     postData
                 );
 
-                solvedTime.value = +response.data.time.toFixed(4);
-                generations.value = response.data.generations;
+                result.time = +response.data.time.toFixed(4);
+                result.generations = response.data.generations;
+                result.error = "";
 
-                isSolving.value = false;
-                isSolved.value = true;
+                status.isSolving = false;
+                status.isSolved = true;
             } catch (err) {
                 console.error(err);
 
-                isSolving.value = false;
-                isSolved.value = true;
-                solveError.value = {
-                    checked: true,
-                    message: err,
-                };
+                status.isSolving = false;
+                status.isSolved = true;
+                result.error = err;
             }
         }
 
         //-------------------------------- Watchers --------------------------------//
         // Animate whenever getting a solution
-        watch(generations, (curr) => {
-            console.log("[watch] 'generations' changed...");
 
-            if (curr.length === 0) {
-                return;
+        watch(
+            () => result.generations,
+            (curr) => {
+                console.log("[watch] 'result' changed...");
+
+                if (curr.length === 0) {
+                    return;
+                }
+
+                status.isRunning = true;
+
+                animateGenerationsAfterSolved(curr);
             }
-
-            isRunning.value = true;
-
-            animateGenerationsAfterSolved(curr);
-        });
+        );
 
         // Change animation's speed
         watch(speed, (curr) => {
@@ -487,12 +497,8 @@ export default defineComponent({
             kNumber,
             kNumberComputed,
             edgeLength,
-            isSolving,
-            isSolved,
-            isRunning,
-            solveError,
-            solvedTime,
-            countGeneration,
+            status,
+            result,
             currentIndividual,
             solve,
             reset,
