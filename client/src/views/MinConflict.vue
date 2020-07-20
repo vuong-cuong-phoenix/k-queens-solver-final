@@ -177,13 +177,13 @@ export default defineComponent({
             }),
         });
 
-        const kNumber = ref<number>(4);
+        const kNumber = ref<number>(8);
         const kNumberList: number[] = [];
         for (let i = 4; i <= 20; ++i) {
             kNumberList.push(i);
         }
 
-        const edgeLength = ref<number>(4);
+        const edgeLength = ref<number>(3.5);
 
         const isSolving = ref<boolean>(false);
         const isSolved = ref<boolean>(false);
