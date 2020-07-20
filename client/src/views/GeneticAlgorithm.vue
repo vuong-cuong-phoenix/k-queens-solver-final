@@ -26,8 +26,16 @@
             <!-- END 2 Parents -->
 
             <!-- 'Chich nhau' icon -->
-            <div class="flex items-center justify-center w-full px-4 mt-8 md:w-2/12 md:mt-0">
+            <div class="relative flex flex-col items-center justify-center w-full px-4 mt-8 md:w-2/12 md:mt-0">
                 <GenerateIcon class="w-20 h-20 md:w-32 md:h-32 generate-icon" />
+                <div
+                    v-if="!status.isSolving && status.isSolved && (result.error === '')"
+                    ref="countGenerationRef"
+                    class="absolute text-lg font-semibold text-center opacity-0 count-generation"
+                >
+                    <span>Generation</span>
+                    <span class="ml-1 text-blue-700">#{{ status.countGeneration }}</span>
+                </div>
             </div>
             <!-- END 'Chich nhau' icon -->
 
@@ -108,13 +116,17 @@
                             <span class="ml-2 font-semibold text-blue-700">{{ result.time }}</span>
                             <span class="ml-1 italic">seconds</span>
                         </div>
-                        <div
-                            ref="countGenerationRef"
-                            class="text-lg font-semibold text-center opacity-0"
-                        >
-                            <span class="">Generation</span>
-                            <span class="ml-1 text-blue-700">#{{ status.countGeneration }}</span>
+                        <div class="text-lg font-semibold text-center">
+                            <span class="text-blue-700">{{ result.generations.length }}</span>
+                            <span class="ml-1">generations</span>
                         </div>
+                        <!-- <div -->
+                        <!--     ref="countGenerationRef" -->
+                        <!--     class="text-lg font-semibold text-center opacity-0" -->
+                        <!-- > -->
+                        <!--     <span class="">Generation</span> -->
+                        <!--     <span class="ml-1 text-blue-700">#{{ status.countGeneration }}</span> -->
+                        <!-- </div> -->
                     </div>
 
                     <div v-if="(result.error !== '') && !status.isSolving">
@@ -211,8 +223,8 @@ export default defineComponent({
         }
 
         //-------------------------------- Data --------------------------------//
-        const kNumber = ref<number>(4);
-        const edgeLength = ref<number>(2.5);
+        const kNumber = ref<number>(8);
+        const edgeLength = ref<number>(1.5);
         const crossOverPoint = ref<number>(Math.floor(kNumber.value / 2 - 1));
 
         // UI/UX
@@ -520,6 +532,10 @@ export default defineComponent({
 .generate-icon,
 .processing-icon {
     transform: rotate(90deg);
+}
+
+.count-generation {
+    top: calc(50% + 8rem / 2);
 }
 
 @media (max-width: 768px) {
