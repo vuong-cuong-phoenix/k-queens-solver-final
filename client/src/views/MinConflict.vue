@@ -123,7 +123,6 @@
         <!-- List of steps -->
         <div class="w-full px-4 md:w-4/12">
             <ListMoves
-                ref="listMovesRef"
                 :steps="steps"
                 @moveRefsChanged="(refs) => moveRefs = refs"
             />
@@ -235,7 +234,9 @@ export default defineComponent({
         const queenRefs = ref<Element[]>([]);
         bus.$on("queenRefs", (refs: Element[]) => (queenRefs.value = refs));
 
-        const listMovesRef = ref<Vue>();
+        const listMovesRef = ref<Element>();
+        bus.$on("listMovesRef", (ref: Element) => (listMovesRef.value = ref));
+
         const moveRefs = ref<Element[]>([]);
 
         //---------------- Functionalities ----------------
@@ -424,7 +425,7 @@ export default defineComponent({
                     display: "flex",
                     duration: 0,
                     onComplete: () => {
-                        listMovesRef.value!.$el.scrollTop = listMovesRef.value!.$el.scrollHeight;
+                        listMovesRef.value!.scrollTop = listMovesRef.value!.scrollHeight;
                     },
                 });
                 timelines.moves.to(element, {
