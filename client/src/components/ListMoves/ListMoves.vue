@@ -10,6 +10,7 @@
             v-for="(step, index) in steps"
             :key="index"
             :step="step"
+            :index="index"
         />
     </div>
 </template>
