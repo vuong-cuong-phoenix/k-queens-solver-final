@@ -407,11 +407,12 @@ export default defineComponent({
                     //x: `${step.choice.x * edgeLength.value}rem`,
                     //duration: baseDuration,
                     duration: 0,
-                    color: "black",
+                    color: "#000000",
                 });
             });
 
             timelines.queens.eventCallback("onComplete", () => {
+                currentState.value = generateDefaultState(kNumber.value);
                 isRunning.value = false;
             });
         });
