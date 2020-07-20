@@ -19,12 +19,15 @@
                 <span class="ml-2 text-xl font-semibold"> K-Queens Solver</span>
             </div>
 
-            <button class="hover:text-gray-300 focus:outline-none">
+            <a
+                href="https://github.com/vuong-cuong-phoenix/k-queens-solver"
+                class="cursor-pointer hover:text-gray-300 focus:outline-none"
+            >
                 <font-awesome-icon
                     :icon="['fab', 'github']"
                     size="lg"
                 ></font-awesome-icon>
-            </button>
+            </a>
         </div>
     </header>
 </template>
