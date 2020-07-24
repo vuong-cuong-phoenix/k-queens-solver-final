@@ -1,7 +1,6 @@
 <template>
     <div class="flex flex-wrap -mx-4">
         <div class="w-full px-4 md:w-8/12">
-            <!-- ref="boardContainerRef" -->
             <!-- Main Chess's board -->
             <ChessBoard
                 class="mx-auto"
@@ -458,7 +457,6 @@ export default defineComponent({
             solvedTime,
             steps,
             speedComputed,
-            listMovesRef,
             moveRefs,
             randomize,
             reset,
