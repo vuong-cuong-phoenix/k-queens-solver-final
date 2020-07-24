@@ -106,7 +106,7 @@ def solve(nq):
     output = []
     output.append(initial)
 
-    while not maxFitness in [fitness(chrom, maxFitness) for chrom in population] and generation <= 500 and time_out <= 210:
+    while not maxFitness in [fitness(chrom, maxFitness) for chrom in population] and generation <= 500 and time_out <= 350:
         # while not maxFitness in [fitness(chrom, maxFitness) for chrom in population]:
         print("=== Generation {} ===".format(generation), len(population))
         population, generation_output = genetic_queen(
@@ -122,7 +122,7 @@ def solve(nq):
         time_out = time.time() - start_time
     # [print(x) for x in output]
     # print(json.dumps({"generation": output, "time": time.time() - start_time}, indent=4, sort_keys=True))
-    if generation > 500 or time_out > 210:
+    if generation > 500 or time_out > 350:
         return output, time.time() - start_time, False
     return output, time.time() - start_time, True
     # return generation + 1
